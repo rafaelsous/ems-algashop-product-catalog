@@ -1,1 +1,1 @@
-# ems-product-catalog
+# ems-algashop-product-catalog
