@@ -16,16 +16,19 @@ Contract.make {
             contentType 'application/json'
         }
         body([
-                id: fromRequest().path(3),
-                addedAt: anyIso8601WithOffset(),
-                name: "Notebook X11",
-                brand: "Deep Diver",
+                id          : fromRequest().path(3),
+                addedAt     : anyIso8601WithOffset(),
+                name        : "Notebook X11",
+                brand       : "Deep Diver",
                 regularPrice: 1500.00,
-                salePrice: 1000.00,
-                inStock: false,
-                enabled: true,
-                categoryId: anyUuid(),
-                description: "A Gamer Notebook"
+                salePrice   : 1000.00,
+                inStock     : true,
+                enabled     : true,
+                description : "A Gamer Notebook",
+                category    : [
+                        id  : anyUuid(),
+                        name: "Informática"
+                ]
         ])
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.nio.charset.StandardCharsets;
 
 @WebMvcTest(controllers = ProductController.class)
-public class ProductBase {
+class ProductBase {
 
     @Autowired
     private WebApplicationContext webApplicationContext;

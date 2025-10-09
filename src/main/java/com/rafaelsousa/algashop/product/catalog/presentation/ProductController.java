@@ -1,9 +1,7 @@
 package com.rafaelsousa.algashop.product.catalog.presentation;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -15,6 +13,8 @@ public class ProductController {
 
     @GetMapping("/{productId}")
     public ProductDetailOutput findById(@PathVariable("productId") UUID productId) {
+        UUID categoryId = UUID.randomUUID();
+
         return ProductDetailOutput.builder()
                 .id(productId)
                 .addedAt(OffsetDateTime.now())
@@ -22,10 +22,33 @@ public class ProductController {
                 .brand("Deep Diver")
                 .regularPrice(BigDecimal.valueOf(1500.00))
                 .salePrice(BigDecimal.valueOf(1000.00))
-                .inStock(false)
+                .inStock(true)
                 .enabled(true)
-                .categoryId(UUID.randomUUID())
                 .description("A Gamer Notebook")
+                .category(CategoryMininalOutput.builder()
+                        .id(categoryId)
+                        .name("Informática")
+                        .build())
+                .build();
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductDetailOutput create(@RequestBody ProductInput productInput) {
+        return ProductDetailOutput.builder()
+                .id(UUID.randomUUID())
+                .addedAt(OffsetDateTime.now())
+                .name(productInput.getName())
+                .brand(productInput.getBrand())
+                .regularPrice(productInput.getRegularPrice())
+                .salePrice(productInput.getSalePrice())
+                .inStock(false)
+                .enabled(productInput.getEnabled())
+                .description(productInput.getDescription())
+                .category(CategoryMininalOutput.builder()
+                        .id(productInput.getCategoryId())
+                        .name("Informática")
+                        .build())
                 .build();
     }
 }
