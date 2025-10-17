@@ -58,7 +58,7 @@ Contract.make {
                 enabled     : fromRequest().body('$.enabled'),
                 description : fromRequest().body('$.description'),
                 category    : [
-                        id  : fromRequest().body('$.categoryId'),
+                        id  : anyUuid(),
                         name: "Informática"
                 ]
         ])

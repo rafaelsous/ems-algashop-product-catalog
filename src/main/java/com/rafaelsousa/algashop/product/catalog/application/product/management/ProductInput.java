@@ -1,4 +1,4 @@
-package com.rafaelsousa.algashop.product.catalog.presentation;
+package com.rafaelsousa.algashop.product.catalog.application.product.management;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

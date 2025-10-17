@@ -1,4 +1,4 @@
-package com.rafaelsousa.algashop.product.catalog.presentation;
+package com.rafaelsousa.algashop.product.catalog.application.product.query;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
