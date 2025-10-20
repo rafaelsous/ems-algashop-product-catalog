@@ -25,7 +25,15 @@ Contract.make {
                 type     : "/errors/invalid-fields",
                 title    : "Invalid fields",
                 detail   : "One or more fields are invalid",
-                timestamp: anyIso8601WithOffset()
+                timestamp: anyIso8601WithOffset(),
+                fields: [
+                        name: anyNonBlankString(),
+                        brand: anyNonBlankString(),
+                        regularPrice: anyNonBlankString(),
+                        salePrice: anyNonBlankString(),
+                        enabled: anyNonBlankString(),
+                        categoryId: anyNonBlankString(),
+                ]
         ])
     }
 }
