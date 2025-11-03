@@ -39,4 +39,17 @@ public class ProductController {
             ) {
         return productQueryService.filter(size, number);
     }
+
+    @PutMapping("/{productId}")
+    public ProductDetailOutput update(@PathVariable("productId") UUID productId, @RequestBody @Valid ProductInput productInput) {
+        productManagementApplicationService.update(productId, productInput);
+
+        return productQueryService.findById(productId);
+    }
+
+    @DeleteMapping("/{productId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable("productId") UUID productId) {
+        productManagementApplicationService.disable(productId);
+    }
 }
