@@ -1,5 +1,6 @@
 package com.rafaelsousa.algashop.product.catalog.application.product.query;
 
+import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryMininalOutput;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

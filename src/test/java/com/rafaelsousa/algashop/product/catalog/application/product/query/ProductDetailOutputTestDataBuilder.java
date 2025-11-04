@@ -1,5 +1,7 @@
 package com.rafaelsousa.algashop.product.catalog.application.product.query;
 
+import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryMininalOutput;
+
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;

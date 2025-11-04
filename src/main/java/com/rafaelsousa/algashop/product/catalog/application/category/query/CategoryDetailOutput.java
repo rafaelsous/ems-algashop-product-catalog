@@ -1,4 +1,4 @@
-package com.rafaelsousa.algashop.product.catalog.application.product.query;
+package com.rafaelsousa.algashop.product.catalog.application.category.query;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryMininalOutput {
+public class CategoryDetailOutput {
     private UUID id;
     private String name;
+    private Boolean enabled;
 }
