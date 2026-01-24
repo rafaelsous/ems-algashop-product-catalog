@@ -6,7 +6,7 @@ import com.rafaelsousa.algashop.product.catalog.application.product.query.PageMo
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryDetailOutput;
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryDetailOutputTestDataBuilder;
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryQueryService;
-import com.rafaelsousa.algashop.product.catalog.presentation.CategoryController;
+import com.rafaelsousa.algashop.product.catalog.presentation.category.CategoryController;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -7,7 +7,7 @@ import com.rafaelsousa.algashop.product.catalog.application.product.query.PageMo
 import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductDetailOutput;
 import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductDetailOutputTestDataBuilder;
 import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductQueryService;
-import com.rafaelsousa.algashop.product.catalog.presentation.ProductController;
+import com.rafaelsousa.algashop.product.catalog.presentation.product.ProductController;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;

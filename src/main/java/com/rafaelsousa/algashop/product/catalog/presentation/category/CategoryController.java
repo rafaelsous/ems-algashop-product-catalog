@@ -1,4 +1,4 @@
-package com.rafaelsousa.algashop.product.catalog.presentation;
+package com.rafaelsousa.algashop.product.catalog.presentation.category;
 
 import com.rafaelsousa.algashop.product.catalog.application.category.management.CategoryInput;
 import com.rafaelsousa.algashop.product.catalog.application.category.management.CategoryManagementApplicationService;
