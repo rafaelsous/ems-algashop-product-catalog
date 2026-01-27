@@ -39,7 +39,7 @@ public class ProductManagementApplicationService {
                 .name(productInput.getName())
                 .brand(productInput.getBrand())
                 .description(productInput.getDescription())
-                .enable(productInput.getEnabled())
+                .enabled(productInput.getEnabled())
                 .regularPrice(productInput.getRegularPrice())
                 .salePrice(productInput.getSalePrice())
                 .build();
