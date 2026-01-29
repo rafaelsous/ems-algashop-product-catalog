@@ -16,7 +16,7 @@ public class ProductDetailOutputTestDataBuilder {
 
         return ProductDetailOutput.builder()
                 .id(productId)
-                .addedAt(OffsetDateTime.now())
+                .createdAt(OffsetDateTime.now())
                 .name("Notebook X11")
                 .brand("Deep Diver")
                 .regularPrice(BigDecimal.valueOf(1500.00))
@@ -33,7 +33,7 @@ public class ProductDetailOutputTestDataBuilder {
     public static ProductDetailOutput.ProductDetailOutputBuilder aProductAlt() {
         return ProductDetailOutput.builder()
                 .id(UUID.randomUUID())
-                .addedAt(OffsetDateTime.now())
+                .createdAt(OffsetDateTime.now())
                 .name("Interruptor")
                 .brand("Tramontina")
                 .regularPrice(BigDecimal.valueOf(150.00))

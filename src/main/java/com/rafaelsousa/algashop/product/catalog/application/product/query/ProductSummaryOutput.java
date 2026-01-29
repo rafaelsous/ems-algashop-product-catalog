@@ -1,20 +1,19 @@
 package com.rafaelsousa.algashop.product.catalog.application.product.query;
 
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryMininalOutput;
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import java.util.UUID;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDetailOutput {
+public class ProductSummaryOutput {
     private UUID id;
     private OffsetDateTime createdAt;
     private String name;
@@ -23,7 +22,7 @@ public class ProductDetailOutput {
     private BigDecimal salePrice;
     private Boolean inStock;
     private Boolean enabled;
-    private String description;
+    private String shortDescription;
     private CategoryMininalOutput category;
 
     private String slug;

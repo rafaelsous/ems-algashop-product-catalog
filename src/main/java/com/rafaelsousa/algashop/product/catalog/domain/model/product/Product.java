@@ -4,6 +4,7 @@ import com.rafaelsousa.algashop.product.catalog.domain.model.DomainException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.IdGenerator;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.Category;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -53,6 +54,8 @@ public class Product {
     @DocumentReference
     private Category category;
 
+    private Integer discountPercentageRounded;
+
     @Builder
     public Product(String name, String brand, String description, Boolean enabled,
                    BigDecimal regularPrice, BigDecimal salePrice, Category category) {
@@ -66,12 +69,6 @@ public class Product {
         this.setSalePrice(salePrice);
         this.setQuantityInStock(0);
         this.setCategory(category);
-    }
-
-    private void setId(UUID id) {
-        Objects.requireNonNull(id);
-
-        this.id = id;
     }
 
     public void setName(String name) {
@@ -90,16 +87,6 @@ public class Product {
         this.brand = brand;
     }
 
-    private void setQuantityInStock(Integer quantityInStock) {
-        Objects.requireNonNull(quantityInStock);
-
-        if (quantityInStock < 0) {
-            throw new IllegalArgumentException();
-        }
-
-        this.quantityInStock = quantityInStock;
-    }
-
     public void setRegularPrice(BigDecimal regularPrice) {
         Objects.requireNonNull(regularPrice);
 
@@ -114,6 +101,7 @@ public class Product {
         }
 
         this.regularPrice = regularPrice;
+        this.calculateDiscountPercentageRounded();
     }
 
     public void setSalePrice(BigDecimal salePrice) {
@@ -130,6 +118,7 @@ public class Product {
         }
 
         this.salePrice = salePrice;
+        this.calculateDiscountPercentageRounded();
     }
 
     public void setEnabled(Boolean enabled) {
@@ -154,5 +143,38 @@ public class Product {
 
     public boolean isInStock() {
         return Objects.nonNull(quantityInStock) && quantityInStock > 0;
+    }
+
+    public boolean getHasDiscount() {
+        return getDiscountPercentageRounded() != null && getDiscountPercentageRounded() > 0;
+    }
+
+    private void setId(UUID id) {
+        Objects.requireNonNull(id);
+
+        this.id = id;
+    }
+
+    private void setQuantityInStock(Integer quantityInStock) {
+        Objects.requireNonNull(quantityInStock);
+
+        if (quantityInStock < 0) {
+            throw new IllegalArgumentException();
+        }
+
+        this.quantityInStock = quantityInStock;
+    }
+
+    private void calculateDiscountPercentageRounded() {
+        if (regularPrice == null || salePrice == null || regularPrice.signum() == 0) {
+            discountPercentageRounded = 0;
+            return;
+        }
+
+        discountPercentageRounded = BigDecimal.ONE
+                .subtract(salePrice.divide(regularPrice, 4, RoundingMode.HALF_UP))
+                .multiply(BigDecimal.valueOf(100))
+                .setScale(2, RoundingMode.HALF_UP)
+                .intValue();
     }
 }

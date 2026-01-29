@@ -3,6 +3,7 @@ package com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.prod
 import com.rafaelsousa.algashop.product.catalog.application.product.query.PageModel;
 import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductDetailOutput;
 import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductQueryService;
+import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductSummaryOutput;
 import com.rafaelsousa.algashop.product.catalog.application.utility.Mapper;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductNotFoundException;
@@ -26,7 +27,7 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     }
 
     @Override
-    public PageModel<ProductDetailOutput> filter(Integer size, Integer number) {
+    public PageModel<ProductSummaryOutput> filter(Integer size, Integer number) {
         return null;
     }
 }

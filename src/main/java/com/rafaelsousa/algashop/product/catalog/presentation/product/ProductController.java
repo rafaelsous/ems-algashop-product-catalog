@@ -5,6 +5,7 @@ import com.rafaelsousa.algashop.product.catalog.application.product.management.P
 import com.rafaelsousa.algashop.product.catalog.application.product.query.PageModel;
 import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductDetailOutput;
 import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductQueryService;
+import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductSummaryOutput;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.presentation.UnprocessableContentException;
 import jakarta.validation.Valid;
@@ -40,7 +41,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public PageModel<ProductDetailOutput> filter(
+    public PageModel<ProductSummaryOutput> filter(
             @RequestParam(name = "size", required = false) Integer size,
             @RequestParam(name = "number", required = false) Integer number
             ) {
