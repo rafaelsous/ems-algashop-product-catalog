@@ -2,6 +2,7 @@ package com.rafaelsousa.algashop.product.catalog.domain.model.product;
 
 import com.rafaelsousa.algashop.product.catalog.domain.model.DomainException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.IdGenerator;
+import com.rafaelsousa.algashop.product.catalog.domain.model.category.Category;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Objects;
@@ -10,6 +11,8 @@ import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -46,9 +49,13 @@ public class Product {
     @LastModifiedBy
     private UUID lastModifiedByUserId;
 
+    @Field(name = "categoryId")
+    @DocumentReference
+    private Category category;
+
     @Builder
     public Product(String name, String brand, String description, Boolean enabled,
-                   BigDecimal regularPrice, BigDecimal salePrice) {
+                   BigDecimal regularPrice, BigDecimal salePrice, Category category) {
         this.setId(IdGenerator.generateTimeBasedUUID());
         
         this.setName(name);
@@ -58,6 +65,13 @@ public class Product {
         this.setRegularPrice(regularPrice);
         this.setSalePrice(salePrice);
         this.setQuantityInStock(0);
+        this.setCategory(category);
+    }
+
+    private void setId(UUID id) {
+        Objects.requireNonNull(id);
+
+        this.id = id;
     }
 
     public void setName(String name) {
@@ -74,6 +88,16 @@ public class Product {
         }
 
         this.brand = brand;
+    }
+
+    private void setQuantityInStock(Integer quantityInStock) {
+        Objects.requireNonNull(quantityInStock);
+
+        if (quantityInStock < 0) {
+            throw new IllegalArgumentException();
+        }
+
+        this.quantityInStock = quantityInStock;
     }
 
     public void setRegularPrice(BigDecimal regularPrice) {
@@ -114,6 +138,12 @@ public class Product {
         this.enabled = enabled;
     }
 
+    public void setCategory(Category category) {
+        Objects.requireNonNull(category);
+
+        this.category = category;
+    }
+
     public void disable() {
         this.setEnabled(false);
     }
@@ -124,21 +154,5 @@ public class Product {
 
     public boolean isInStock() {
         return Objects.nonNull(quantityInStock) && quantityInStock > 0;
-    }
-
-    private void setId(UUID id) {
-        Objects.requireNonNull(id);
-
-        this.id = id;
-    }
-
-    private void setQuantityInStock(Integer quantityInStock) {
-        Objects.requireNonNull(quantityInStock);
-
-        if (quantityInStock < 0) {
-            throw new IllegalArgumentException();
-        }
-
-        this.quantityInStock = quantityInStock;
     }
 }
