@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ProductDetailOutput {
     private UUID id;
-    private OffsetDateTime addedAt;
+    private OffsetDateTime createdAt;
     private String name;
     private String brand;
     private BigDecimal regularPrice;

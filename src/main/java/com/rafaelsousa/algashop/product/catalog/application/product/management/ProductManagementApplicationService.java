@@ -4,6 +4,7 @@ import com.rafaelsousa.algashop.product.catalog.domain.model.category.Category;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryRepository;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;
+import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductRepository;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
@@ -24,11 +25,26 @@ public class ProductManagementApplicationService {
     }
 
     public void update(UUID productId, ProductInput productInput) {
+        Product product = findProduct(productId);
+        Category category = findCategory(productInput.getCategoryId());
 
+        updateProduct(product, productInput);
+
+        productRepository.save(product);
     }
 
     public void disable(UUID productId) {
+        Product product = findProduct(productId);
+        product.disable();
 
+        productRepository.save(product);
+    }
+
+    public void enable(UUID productId) {
+        Product product = findProduct(productId);
+        product.enable();
+
+        productRepository.save(product);
     }
 
     private Product mapToProduct(ProductInput productInput) {
@@ -47,5 +63,19 @@ public class ProductManagementApplicationService {
     private Category findCategory(@NotNull UUID categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+    }
+
+    private Product findProduct(UUID productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(productId));
+    }
+
+    private void updateProduct(Product product, ProductInput productInput) {
+        product.setName(productInput.getName());
+        product.setBrand(productInput.getBrand());
+        product.setDescription(productInput.getDescription());
+        product.setEnabled(productInput.getEnabled());
+        product.setRegularPrice(productInput.getRegularPrice());
+        product.setSalePrice(productInput.getSalePrice());
     }
 }
