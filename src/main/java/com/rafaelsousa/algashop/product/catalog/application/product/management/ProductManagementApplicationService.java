@@ -1,13 +1,12 @@
 package com.rafaelsousa.algashop.product.catalog.application.product.management;
 
-import com.rafaelsousa.algashop.product.catalog.application.product.ResourceNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.Category;
+import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryRepository;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductRepository;
-import java.util.UUID;
-
 import jakarta.validation.constraints.NotNull;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +46,6 @@ public class ProductManagementApplicationService {
 
     private Category findCategory(@NotNull UUID categoryId) {
         return categoryRepository.findById(categoryId)
-                .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
     }
 }

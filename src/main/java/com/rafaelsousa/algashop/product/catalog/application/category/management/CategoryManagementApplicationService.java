@@ -1,7 +1,7 @@
 package com.rafaelsousa.algashop.product.catalog.application.category.management;
 
-import com.rafaelsousa.algashop.product.catalog.application.product.ResourceNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.Category;
+import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class CategoryManagementApplicationService {
 
     public void update(UUID categoryId, CategoryInput categoryInput) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
         category.setName(categoryInput.getName());
         category.setEnabled(categoryInput.getEnabled());
@@ -31,7 +31,7 @@ public class CategoryManagementApplicationService {
 
     public void disable(UUID categoryId) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(() -> new CategoryNotFoundException(categoryId));
 
         category.setEnabled(false);
 

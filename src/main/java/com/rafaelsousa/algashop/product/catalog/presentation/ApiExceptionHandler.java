@@ -1,6 +1,12 @@
 package com.rafaelsousa.algashop.product.catalog.presentation;
 
 import com.rafaelsousa.algashop.product.catalog.application.product.ResourceNotFoundException;
+import com.rafaelsousa.algashop.product.catalog.domain.model.DomainEntityNotFoundException;
+import com.rafaelsousa.algashop.product.catalog.domain.model.DomainException;
+import java.net.URI;
+import java.time.OffsetDateTime;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -13,11 +19,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.net.URI;
-import java.time.OffsetDateTime;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 @Slf4j
 @AllArgsConstructor
 @RestControllerAdvice
@@ -28,9 +29,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                                  HttpHeaders headers,
-                                                                  HttpStatusCode status,
-                                                                  WebRequest request) {
+              HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(status);
         problemDetail.setTitle("Invalid fields");
         problemDetail.setDetail("One or more fields are invalid");
@@ -49,11 +48,21 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return super.handleExceptionInternal(ex, problemDetail, headers, status, request);
     }
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ProblemDetail handleResourceNotFoundException(ResourceNotFoundException ex) {
+  @ExceptionHandler({DomainEntityNotFoundException.class, ResourceNotFoundException.class})
+  public ProblemDetail handleResourceNotFoundException(Exception ex) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
         problemDetail.setType(URI.create("/errors/not-found"));
         problemDetail.setTitle("Not found");
+        problemDetail.setProperty(TIMESTAMP_PROPERTY_NAME, OffsetDateTime.now());
+
+        return problemDetail;
+    }
+
+  @ExceptionHandler({DomainException.class, UnprocessableContentException.class})
+  public ProblemDetail handleUnprocessableContentException(Exception ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
+        problemDetail.setType(URI.create("/errors/unprocessable-content"));
+        problemDetail.setTitle("Unprocessable content");
         problemDetail.setProperty(TIMESTAMP_PROPERTY_NAME, OffsetDateTime.now());
 
         return problemDetail;

@@ -5,12 +5,13 @@ import com.rafaelsousa.algashop.product.catalog.application.product.management.P
 import com.rafaelsousa.algashop.product.catalog.application.product.query.PageModel;
 import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductDetailOutput;
 import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductQueryService;
+import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
+import com.rafaelsousa.algashop.product.catalog.presentation.UnprocessableContentException;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,7 +28,13 @@ public class ProductController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProductDetailOutput create(@RequestBody @Valid ProductInput productInput) {
-        UUID productId = productManagementApplicationService.create(productInput);
+        UUID productId;
+
+        try {
+            productId = productManagementApplicationService.create(productInput);
+        } catch (CategoryNotFoundException ex) {
+            throw new UnprocessableContentException(ex.getMessage(), ex);
+        }
 
         return productQueryService.findById(productId);
     }

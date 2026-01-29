@@ -1,16 +1,15 @@
 package com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.product;
 
-import com.rafaelsousa.algashop.product.catalog.application.product.ResourceNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.application.product.query.PageModel;
 import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductDetailOutput;
 import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductQueryService;
 import com.rafaelsousa.algashop.product.catalog.application.utility.Mapper;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;
+import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductRepository;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +20,7 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     @Override
     public ProductDetailOutput findById(UUID productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(ResourceNotFoundException::new);
+                .orElseThrow(() -> new ProductNotFoundException(productId));
 
         return mapper.convert(product, ProductDetailOutput.class);
     }
