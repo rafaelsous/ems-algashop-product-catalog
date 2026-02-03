@@ -41,6 +41,7 @@ configurations {
         extendsFrom annotationProcessor
     }
     asciidoctorExt
+    mockitoAgent {transitive = false}
 }
 
 dependencies {
@@ -54,12 +55,15 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-restdocs'
-    testImplementation 'org.springframework.boot:spring-boot-starter-mongodb-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-mongodb-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testImplementation 'org.springframework.cloud:spring-cloud-starter-contract-verifier'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    mockitoAgent 'org.mockito:mockito-core'
 }
 
 dependencyManagement {
@@ -72,6 +76,10 @@ contracts {
     packageWithBaseClasses = "com.rafaelsousa.algashop.product.catalog.contract.base"
 }
 
+tasks.named('check') {
+    dependsOn(test, contractTest, integrationTest)
+}
+
 tasks.named('contractTest') {
     outputs.dir snippetsDir
 	useJUnitPlatform()
@@ -79,6 +87,35 @@ tasks.named('contractTest') {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+test {
+    filter {
+        excludeTestsMatching("*IT")
+    }
+    jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
+}
+
+tasks.register('integrationTest', Test) {
+    description = 'Run integration tests.'
+    group = 'verification'
+    jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
+
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+
+    shouldRunAfter test
+
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed"
+    }
+
+    filter {
+        includeTestsMatching "*IT"
+        excludeTestsMatching "*Test"
+    }
 }
 
 asciidoctor {
