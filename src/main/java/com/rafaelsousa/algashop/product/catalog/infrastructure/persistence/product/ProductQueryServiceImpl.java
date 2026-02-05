@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.aggregation.AggregationExpressionCriteria;
+import org.springframework.data.mongodb.core.aggregation.ComparisonOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -70,10 +72,25 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     private Query queryWith(ProductFilter filter) {
         Query query = new Query();
 
+        filterByEnabled(filter, query);
+        filterByCreationDateRange(filter, query);
+        filterByPriceRange(filter, query);
+        filterByHasDiscount(filter, query);
+
+        return query;
+    }
+
+    private Sort sortWith(ProductFilter filter) {
+        return Sort.by(filter.getSortDirectionOrDefault(), filter.getSortByPropertyOrDefault().getPropertyName());
+    }
+
+    private static void filterByEnabled(ProductFilter filter, Query query) {
         if (filter.getEnabled() != null) {
             query.addCriteria(Criteria.where("enabled").is(filter.getEnabled()));
         }
+    }
 
+    private static void filterByCreationDateRange(ProductFilter filter, Query query) {
         if (filter.getCreatedAtFrom() != null && filter.getCreatedAtTo() != null) {
             query.addCriteria(Criteria.where(CREATED_AT_PROPERTY_NAME)
                     .gte(filter.getCreatedAtFrom())
@@ -86,7 +103,9 @@ public class ProductQueryServiceImpl implements ProductQueryService {
                 query.addCriteria(Criteria.where(CREATED_AT_PROPERTY_NAME).lte(filter.getCreatedAtTo()));
             }
         }
+    }
 
+    private static void filterByPriceRange(ProductFilter filter, Query query) {
         if (filter.getPriceFrom() != null && filter.getPriceTo() != null) {
             query.addCriteria(Criteria.where(SALE_PRICE_PROPERTY_NAME)
                     .gte(filter.getPriceFrom())
@@ -99,11 +118,23 @@ public class ProductQueryServiceImpl implements ProductQueryService {
                 query.addCriteria(Criteria.where(SALE_PRICE_PROPERTY_NAME).lte(filter.getPriceTo()));
             }
         }
-
-        return query;
     }
 
-    private Sort sortWith(ProductFilter filter) {
-        return Sort.by(filter.getSortDirectionOrDefault(), filter.getSortByPropertyOrDefault().getPropertyName());
+    private static void filterByHasDiscount(ProductFilter filter, Query query) {
+        Boolean hasDiscount = filter.getHasDiscount();
+
+        if (hasDiscount != null) {
+            if (hasDiscount) {
+                query.addCriteria(AggregationExpressionCriteria.whereExpr(
+                        ComparisonOperators.valueOf("$salePrice")
+                                .lessThan("$regularPrice")
+                ));
+            } else {
+                query.addCriteria(AggregationExpressionCriteria.whereExpr(
+                        ComparisonOperators.valueOf("$salePrice")
+                                .equalTo("$regularPrice")
+                ));
+            }
+        }
     }
 }
