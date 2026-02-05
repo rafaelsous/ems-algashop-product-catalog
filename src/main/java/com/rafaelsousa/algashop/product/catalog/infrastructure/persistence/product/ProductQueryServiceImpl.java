@@ -5,7 +5,6 @@ import com.rafaelsousa.algashop.product.catalog.application.utility.Mapper;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductRepository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +20,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ProductQueryServiceImpl implements ProductQueryService {
     public static final String CREATED_AT_PROPERTY_NAME = "createdAt";
+    public static final String SALE_PRICE_PROPERTY_NAME = "salePrice";
 
     private final ProductRepository productRepository;
     private final Mapper mapper;
@@ -84,6 +84,19 @@ public class ProductQueryServiceImpl implements ProductQueryService {
                 query.addCriteria(Criteria.where(CREATED_AT_PROPERTY_NAME).gte(filter.getCreatedAtFrom()));
             } else if (filter.getCreatedAtTo() != null) {
                 query.addCriteria(Criteria.where(CREATED_AT_PROPERTY_NAME).lte(filter.getCreatedAtTo()));
+            }
+        }
+
+        if (filter.getPriceFrom() != null && filter.getPriceTo() != null) {
+            query.addCriteria(Criteria.where(SALE_PRICE_PROPERTY_NAME)
+                    .gte(filter.getPriceFrom())
+                    .lte(filter.getPriceTo())
+            );
+        } else {
+            if (filter.getPriceFrom() != null) {
+                query.addCriteria(Criteria.where(SALE_PRICE_PROPERTY_NAME).gte(filter.getPriceFrom()));
+            } else if (filter.getPriceTo() != null) {
+                query.addCriteria(Criteria.where(SALE_PRICE_PROPERTY_NAME).lte(filter.getPriceTo()));
             }
         }
 
