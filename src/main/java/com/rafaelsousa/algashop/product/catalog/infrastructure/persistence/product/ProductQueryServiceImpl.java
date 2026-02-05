@@ -10,6 +10,8 @@ import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductNotF
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,7 +29,10 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     }
 
     @Override
-    public PageModel<ProductSummaryOutput> filter(Integer size, Integer number) {
-        return null;
+    public PageModel<ProductSummaryOutput> filter(Integer size, Integer page) {
+        Page<Product> products = productRepository.findAll(PageRequest.of(page, size));
+        Page<ProductSummaryOutput> productSummaryOutputs = products.map(product -> mapper.convert(product, ProductSummaryOutput.class));
+
+        return PageModel.of(productSummaryOutputs);
     }
 }
