@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ProductQueryServiceImpl implements ProductQueryService {
+    public static final String CREATED_AT_PROPERTY_NAME = "createdAt";
+
     private final ProductRepository productRepository;
     private final Mapper mapper;
     private final MongoOperations mongoOperations;
@@ -70,6 +72,19 @@ public class ProductQueryServiceImpl implements ProductQueryService {
 
         if (filter.getEnabled() != null) {
             query.addCriteria(Criteria.where("enabled").is(filter.getEnabled()));
+        }
+
+        if (filter.getCreatedAtFrom() != null && filter.getCreatedAtTo() != null) {
+            query.addCriteria(Criteria.where(CREATED_AT_PROPERTY_NAME)
+                    .gte(filter.getCreatedAtFrom())
+                    .lte(filter.getCreatedAtTo())
+            );
+        } else {
+            if (filter.getCreatedAtFrom() != null) {
+                query.addCriteria(Criteria.where(CREATED_AT_PROPERTY_NAME).gte(filter.getCreatedAtFrom()));
+            } else if (filter.getCreatedAtTo() != null) {
+                query.addCriteria(Criteria.where(CREATED_AT_PROPERTY_NAME).lte(filter.getCreatedAtTo()));
+            }
         }
 
         return query;
