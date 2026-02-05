@@ -5,6 +5,9 @@ import com.rafaelsousa.algashop.product.catalog.application.utility.Mapper;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductRepository;
+
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -72,10 +75,12 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     private Query queryWith(ProductFilter filter) {
         Query query = new Query();
 
-        filterByEnabled(filter, query);
-        filterByCreationDateRange(filter, query);
-        filterByPriceRange(filter, query);
-        filterByHasDiscount(filter, query);
+        filterByEnabled(filter.getEnabled(), query);
+        filterByCreationDateRange(filter.getCreatedAtFrom(), filter.getCreatedAtTo(), query);
+        filterByPriceRange(filter.getPriceFrom(), filter.getPriceTo(), query);
+        filterByHasDiscount(filter.getHasDiscount(), query);
+        filterByInStock(filter.getInStock(), query);
+        filterByCategoriesId(filter.getCategoriesId(), query);
 
         return query;
     }
@@ -84,45 +89,43 @@ public class ProductQueryServiceImpl implements ProductQueryService {
         return Sort.by(filter.getSortDirectionOrDefault(), filter.getSortByPropertyOrDefault().getPropertyName());
     }
 
-    private static void filterByEnabled(ProductFilter filter, Query query) {
-        if (filter.getEnabled() != null) {
-            query.addCriteria(Criteria.where("enabled").is(filter.getEnabled()));
+    private static void filterByEnabled(Boolean isEnabled, Query query) {
+        if (isEnabled != null) {
+            query.addCriteria(Criteria.where("enabled").is(isEnabled));
         }
     }
 
-    private static void filterByCreationDateRange(ProductFilter filter, Query query) {
-        if (filter.getCreatedAtFrom() != null && filter.getCreatedAtTo() != null) {
+    private static void filterByCreationDateRange(OffsetDateTime createdAtFrom, OffsetDateTime createdAtTo, Query query) {
+        if (createdAtFrom != null && createdAtTo != null) {
             query.addCriteria(Criteria.where(CREATED_AT_PROPERTY_NAME)
-                    .gte(filter.getCreatedAtFrom())
-                    .lte(filter.getCreatedAtTo())
+                    .gte(createdAtFrom)
+                    .lte(createdAtTo)
             );
         } else {
-            if (filter.getCreatedAtFrom() != null) {
-                query.addCriteria(Criteria.where(CREATED_AT_PROPERTY_NAME).gte(filter.getCreatedAtFrom()));
-            } else if (filter.getCreatedAtTo() != null) {
-                query.addCriteria(Criteria.where(CREATED_AT_PROPERTY_NAME).lte(filter.getCreatedAtTo()));
+            if (createdAtFrom != null) {
+                query.addCriteria(Criteria.where(CREATED_AT_PROPERTY_NAME).gte(createdAtFrom));
+            } else if (createdAtTo != null) {
+                query.addCriteria(Criteria.where(CREATED_AT_PROPERTY_NAME).lte(createdAtTo));
             }
         }
     }
 
-    private static void filterByPriceRange(ProductFilter filter, Query query) {
-        if (filter.getPriceFrom() != null && filter.getPriceTo() != null) {
+    private static void filterByPriceRange(BigDecimal priceFrom, BigDecimal priceTo, Query query) {
+        if (priceFrom != null && priceTo != null) {
             query.addCriteria(Criteria.where(SALE_PRICE_PROPERTY_NAME)
-                    .gte(filter.getPriceFrom())
-                    .lte(filter.getPriceTo())
+                    .gte(priceFrom)
+                    .lte(priceTo)
             );
         } else {
-            if (filter.getPriceFrom() != null) {
-                query.addCriteria(Criteria.where(SALE_PRICE_PROPERTY_NAME).gte(filter.getPriceFrom()));
-            } else if (filter.getPriceTo() != null) {
-                query.addCriteria(Criteria.where(SALE_PRICE_PROPERTY_NAME).lte(filter.getPriceTo()));
+            if (priceFrom != null) {
+                query.addCriteria(Criteria.where(SALE_PRICE_PROPERTY_NAME).gte(priceFrom));
+            } else if (priceTo != null) {
+                query.addCriteria(Criteria.where(SALE_PRICE_PROPERTY_NAME).lte(priceTo));
             }
         }
     }
 
-    private static void filterByHasDiscount(ProductFilter filter, Query query) {
-        Boolean hasDiscount = filter.getHasDiscount();
-
+    private static void filterByHasDiscount(Boolean hasDiscount, Query query) {
         if (hasDiscount != null) {
             if (hasDiscount) {
                 query.addCriteria(AggregationExpressionCriteria.whereExpr(
@@ -135,6 +138,22 @@ public class ProductQueryServiceImpl implements ProductQueryService {
                                 .equalTo("$regularPrice")
                 ));
             }
+        }
+    }
+
+    private static void filterByInStock(Boolean inStock, Query query) {
+        if (inStock != null) {
+            if (inStock) {
+                query.addCriteria(Criteria.where("quantityInStock").gt(0));
+            } else {
+                query.addCriteria(Criteria.where("quantityInStock").is(0));
+            }
+        }
+    }
+
+    private void filterByCategoriesId(UUID[] categoriesId, Query query) {
+        if (categoriesId != null && categoriesId.length > 0) {
+            query.addCriteria(Criteria.where("categoryId").in((Object[]) categoriesId));
         }
     }
 }
