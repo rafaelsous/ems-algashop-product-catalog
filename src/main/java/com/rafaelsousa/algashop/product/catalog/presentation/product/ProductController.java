@@ -2,10 +2,7 @@ package com.rafaelsousa.algashop.product.catalog.presentation.product;
 
 import com.rafaelsousa.algashop.product.catalog.application.product.management.ProductInput;
 import com.rafaelsousa.algashop.product.catalog.application.product.management.ProductManagementApplicationService;
-import com.rafaelsousa.algashop.product.catalog.application.product.query.PageModel;
-import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductDetailOutput;
-import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductQueryService;
-import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductSummaryOutput;
+import com.rafaelsousa.algashop.product.catalog.application.product.query.*;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.presentation.UnprocessableContentException;
 import jakarta.validation.Valid;
@@ -41,11 +38,8 @@ public class ProductController {
     }
 
     @GetMapping
-    public PageModel<ProductSummaryOutput> filter(
-            @RequestParam(name = "size", required = false) Integer size,
-            @RequestParam(name = "page", required = false) Integer page
-            ) {
-        return productQueryService.filter(size, page);
+    public PageModel<ProductSummaryOutput> filter(ProductFilter filter) {
+        return productQueryService.filter(filter);
     }
 
     @PutMapping("/{productId}")

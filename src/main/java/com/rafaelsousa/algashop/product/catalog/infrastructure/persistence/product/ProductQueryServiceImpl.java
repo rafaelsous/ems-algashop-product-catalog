@@ -1,9 +1,6 @@
 package com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.product;
 
-import com.rafaelsousa.algashop.product.catalog.application.product.query.PageModel;
-import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductDetailOutput;
-import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductQueryService;
-import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductSummaryOutput;
+import com.rafaelsousa.algashop.product.catalog.application.product.query.*;
 import com.rafaelsousa.algashop.product.catalog.application.utility.Mapper;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductNotFoundException;
@@ -29,9 +26,12 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     }
 
     @Override
-    public PageModel<ProductSummaryOutput> filter(Integer size, Integer page) {
-        Page<Product> products = productRepository.findAll(PageRequest.of(page, size));
-        Page<ProductSummaryOutput> productSummaryOutputs = products.map(product -> mapper.convert(product, ProductSummaryOutput.class));
+    public PageModel<ProductSummaryOutput> filter(ProductFilter filter) {
+        Page<Product> products = productRepository
+                .findAll(PageRequest.of(filter.getPage(), filter.getSize()));
+
+        Page<ProductSummaryOutput> productSummaryOutputs = products
+                .map(product -> mapper.convert(product, ProductSummaryOutput.class));
 
         return PageModel.of(productSummaryOutputs);
     }

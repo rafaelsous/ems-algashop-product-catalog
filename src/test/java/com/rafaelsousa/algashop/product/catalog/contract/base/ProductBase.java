@@ -1,14 +1,17 @@
 package com.rafaelsousa.algashop.product.catalog.contract.base;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import com.rafaelsousa.algashop.product.catalog.application.product.ResourceNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.application.product.management.ProductInput;
 import com.rafaelsousa.algashop.product.catalog.application.product.management.ProductManagementApplicationService;
-import com.rafaelsousa.algashop.product.catalog.application.product.query.PageModel;
-import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductDetailOutput;
-import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductDetailOutputTestDataBuilder;
-import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductQueryService;
+import com.rafaelsousa.algashop.product.catalog.application.product.query.*;
 import com.rafaelsousa.algashop.product.catalog.presentation.product.ProductController;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +24,6 @@ import org.springframework.restdocs.templates.TemplateFormats;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.when;
 
 @WebMvcTest(controllers = ProductController.class)
 @ExtendWith(RestDocumentationExtension.class)
@@ -70,7 +65,7 @@ class ProductBase {
     }
 
     private void mockFilterProducts() {
-        when(productQueryService.filter(anyInt(), anyInt()))
+        when(productQueryService.filter(any(ProductFilter.class)))
                 .then(answer -> {
                     Integer size = answer.getArgument(0);
 
