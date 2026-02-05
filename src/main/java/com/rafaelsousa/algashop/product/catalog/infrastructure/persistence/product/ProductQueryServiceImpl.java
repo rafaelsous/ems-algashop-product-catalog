@@ -5,10 +5,16 @@ import com.rafaelsousa.algashop.product.catalog.application.utility.Mapper;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductRepository;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class ProductQueryServiceImpl implements ProductQueryService {
     private final ProductRepository productRepository;
     private final Mapper mapper;
+    private final MongoOperations mongoOperations;
 
     @Override
     public ProductDetailOutput findById(UUID productId) {
@@ -27,12 +34,48 @@ public class ProductQueryServiceImpl implements ProductQueryService {
 
     @Override
     public PageModel<ProductSummaryOutput> filter(ProductFilter filter) {
-        Page<Product> products = productRepository
-                .findAll(PageRequest.of(filter.getPage(), filter.getSize()));
+        Query query = queryWith(filter);
+        long totalItems = mongoOperations.count(query, Product.class);
 
-        Page<ProductSummaryOutput> productSummaryOutputs = products
-                .map(product -> mapper.convert(product, ProductSummaryOutput.class));
+        Sort sort = sortWith(filter);
 
-        return PageModel.of(productSummaryOutputs);
+        PageRequest pageRequest = PageRequest.of(filter.getPage(), filter.getSize(), sort);
+        Query pagedQuery = query.with(pageRequest);
+
+        int totalPages = 0;
+        List<Product> products;
+
+        if (totalItems > 0) {
+            products = mongoOperations.find(pagedQuery, Product.class);
+            totalPages = (int) Math.ceil((double) totalItems / pageRequest.getPageSize());
+        } else {
+            products = new ArrayList<>();
+        }
+
+        List<ProductSummaryOutput> productSummaryOutputs = products.stream()
+                .map(product -> mapper.convert(product, ProductSummaryOutput.class))
+                .toList();
+
+    return PageModel.<ProductSummaryOutput>builder()
+        .content(productSummaryOutputs)
+            .size(pageRequest.getPageSize())
+            .number(pageRequest.getPageNumber())
+            .totalElements(totalItems)
+            .totalPages(totalPages)
+        .build();
+    }
+
+    private Query queryWith(ProductFilter filter) {
+        Query query = new Query();
+
+        if (filter.getEnabled() != null) {
+            query.addCriteria(Criteria.where("enabled").is(filter.getEnabled()));
+        }
+
+        return query;
+    }
+
+    private Sort sortWith(ProductFilter filter) {
+        return Sort.by(filter.getSortDirectionOrDefault(), filter.getSortByPropertyOrDefault().getPropertyName());
     }
 }
