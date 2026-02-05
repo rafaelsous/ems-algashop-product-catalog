@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -26,6 +27,9 @@ import org.springframework.stereotype.Service;
 public class ProductQueryServiceImpl implements ProductQueryService {
     public static final String CREATED_AT_PROPERTY_NAME = "createdAt";
     public static final String SALE_PRICE_PROPERTY_NAME = "salePrice";
+
+    private static final String FIND_WHOLE_WORD_REGEX = "(?i)(?<= |^)%s(?= |$)";
+    private static final String FIND_PART_OF_A_WORD_REGEX = "(?i)%s";
 
     private final ProductRepository productRepository;
     private final Mapper mapper;
@@ -81,6 +85,7 @@ public class ProductQueryServiceImpl implements ProductQueryService {
         filterByHasDiscount(filter.getHasDiscount(), query);
         filterByInStock(filter.getInStock(), query);
         filterByCategoriesId(filter.getCategoriesId(), query);
+        filterByTerm(filter.getTerm(), query);
 
         return query;
     }
@@ -151,9 +156,23 @@ public class ProductQueryServiceImpl implements ProductQueryService {
         }
     }
 
-    private void filterByCategoriesId(UUID[] categoriesId, Query query) {
+    private static void filterByCategoriesId(UUID[] categoriesId, Query query) {
         if (categoriesId != null && categoriesId.length > 0) {
             query.addCriteria(Criteria.where("categoryId").in((Object[]) categoriesId));
+        }
+    }
+
+    private static void filterByTerm(String term, Query query) {
+        if (StringUtils.isNotBlank(term)) {
+            String regexExpression = String.format(FIND_PART_OF_A_WORD_REGEX,  term);
+
+            query.addCriteria(
+                    new Criteria().orOperator(
+                            Criteria.where("name").regex(regexExpression),
+                            Criteria.where("brand").regex(regexExpression),
+                            Criteria.where("description").regex(regexExpression)
+                    )
+            );
         }
     }
 }
