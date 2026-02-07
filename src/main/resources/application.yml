@@ -22,5 +22,5 @@ algashop:
     sources:
       - location: db/testdata/categories.json
         collection: categories
-      - location: db/testdata/products.json
+      - location: db/testdata/products-large.json
         collection: products
