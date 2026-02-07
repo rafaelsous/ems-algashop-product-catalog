@@ -11,6 +11,7 @@ import java.util.UUID;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.*;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
@@ -20,6 +21,10 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Document(collection = "products")
+@CompoundIndex(name = "idx_product_by_category_enabled_salePrice",
+        def = "{'categoryId': 1, 'enabled': 1, 'salePrice': 1}")
+@CompoundIndex(name = "idx_product_by_category_enabled_createdAt",
+        def = "{'categoryId': 1, 'enabled': 1, 'createdAt': -1}")
 public class Product {
 
     @Id
@@ -53,7 +58,6 @@ public class Product {
     @LastModifiedBy
     private UUID lastModifiedByUserId;
 
-    @Indexed(name = "idx_product_by_category")
     @Field(name = "categoryId")
     @DocumentReference
     private Category category;
