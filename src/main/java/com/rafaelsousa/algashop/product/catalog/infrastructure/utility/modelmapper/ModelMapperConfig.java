@@ -19,7 +19,7 @@ public class ModelMapperConfig {
       ctx -> Slugfier.slugify(ctx.getSource());
 
   private final Converter<String, String> fromStringToShortString =
-      ctx -> StringUtils.abbreviate(ctx.getSource(), 15);
+      ctx -> StringUtils.abbreviate(ctx.getSource(), 50);
 
   @Bean
   public Mapper mapper() {

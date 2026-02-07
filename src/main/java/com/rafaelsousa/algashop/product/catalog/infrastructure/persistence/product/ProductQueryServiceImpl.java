@@ -20,6 +20,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationExpressionCr
 import org.springframework.data.mongodb.core.aggregation.ComparisonOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,9 +28,6 @@ import org.springframework.stereotype.Service;
 public class ProductQueryServiceImpl implements ProductQueryService {
     public static final String CREATED_AT_PROPERTY_NAME = "createdAt";
     public static final String SALE_PRICE_PROPERTY_NAME = "salePrice";
-
-    private static final String FIND_WHOLE_WORD_REGEX = "(?i)(?<= |^)%s(?= |$)";
-    private static final String FIND_PART_OF_A_WORD_REGEX = "(?i)%s";
 
     private final ProductRepository productRepository;
     private final Mapper mapper;
@@ -91,6 +89,10 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     }
 
     private Sort sortWith(ProductFilter filter) {
+        if (StringUtils.isNotBlank(filter.getTerm())) {
+            return Sort.by("score");
+        }
+
         return Sort.by(filter.getSortDirectionOrDefault(), filter.getSortByPropertyOrDefault().getPropertyName());
     }
 
@@ -164,15 +166,7 @@ public class ProductQueryServiceImpl implements ProductQueryService {
 
     private static void filterByTerm(String term, Query query) {
         if (StringUtils.isNotBlank(term)) {
-            String regexExpression = String.format(FIND_PART_OF_A_WORD_REGEX,  term);
-
-            query.addCriteria(
-                    new Criteria().orOperator(
-                            Criteria.where("name").regex(regexExpression),
-                            Criteria.where("brand").regex(regexExpression),
-                            Criteria.where("description").regex(regexExpression)
-                    )
-            );
+            query.addCriteria(TextCriteria.forDefaultLanguage().matching(term));
         }
     }
 }
