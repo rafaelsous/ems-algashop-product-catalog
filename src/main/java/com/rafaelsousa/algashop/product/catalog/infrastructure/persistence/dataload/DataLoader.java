@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.BsonArray;
+import org.bson.BsonDocument;
 import org.bson.Document;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -66,8 +67,8 @@ public class DataLoader implements ApplicationRunner {
         if (CollectionUtils.isEmpty(mongoDocs)) return 0;
 
         try {
-            if (Boolean.TRUE.equals(properties.getAutoDrop())) {
-                mongoOperations.dropCollection(collectionName);
+            if (Boolean.TRUE.equals(properties.getAutoDelete())) {
+                mongoOperations.getCollection(collectionName).deleteMany(new BsonDocument());
             }
 
             return mongoOperations.insert(mongoDocs, collectionName).size();
