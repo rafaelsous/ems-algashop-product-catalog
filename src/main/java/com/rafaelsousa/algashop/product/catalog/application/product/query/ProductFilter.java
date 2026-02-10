@@ -34,11 +34,11 @@ public class ProductFilter extends SortablePageFilter<ProductFilter.SortType> {
     }
 
     @Getter
-    @AllArgsConstructor
+    @RequiredArgsConstructor
     public enum SortType {
         CREATED_AT("createdAt"),
         SALE_PRICE("salePrice");
 
-        private String propertyName;
+        private final String propertyName;
     }
 }

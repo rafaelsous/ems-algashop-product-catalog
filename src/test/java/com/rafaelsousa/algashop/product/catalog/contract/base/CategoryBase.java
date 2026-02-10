@@ -1,27 +1,26 @@
 package com.rafaelsousa.algashop.product.catalog.contract.base;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import com.rafaelsousa.algashop.product.catalog.application.category.management.CategoryInput;
 import com.rafaelsousa.algashop.product.catalog.application.category.management.CategoryManagementApplicationService;
-import com.rafaelsousa.algashop.product.catalog.application.product.query.PageModel;
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryDetailOutput;
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryDetailOutputTestDataBuilder;
+import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryFilter;
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryQueryService;
+import com.rafaelsousa.algashop.product.catalog.application.product.query.PageModel;
 import com.rafaelsousa.algashop.product.catalog.presentation.category.CategoryController;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.when;
 
 @WebMvcTest(controllers = CategoryController.class)
 class CategoryBase {
@@ -55,7 +54,7 @@ class CategoryBase {
     }
 
     private void mockFilterCategories() {
-        when(productQueryService.filter(anyInt(), anyInt()))
+        when(productQueryService.filter(any(CategoryFilter.class)))
                 .then(answer -> {
                     Integer size = answer.getArgument(0);
 
