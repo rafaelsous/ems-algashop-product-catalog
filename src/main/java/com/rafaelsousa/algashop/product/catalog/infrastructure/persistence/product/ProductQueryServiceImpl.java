@@ -78,8 +78,6 @@ public class ProductQueryServiceImpl implements ProductQueryService {
         PageRequest pageRequest = PageRequest.of(filter.getPage(), filter.getSize());
 
         operations.addAll(Arrays.asList(
-                lookup("categories", "categoryId", "_id", "category"),
-                unwind("$category"),
                 sort(sortWith(filter)),
                 projectionForSummary(),
                 skip(pageRequest.getOffset()),
@@ -206,7 +204,7 @@ public class ProductQueryServiceImpl implements ProductQueryService {
 
     private static void filterByCategoriesId(UUID[] categoriesId, List<CriteriaDefinition> criterias) {
         if (categoriesId != null && categoriesId.length > 0) {
-            criterias.add(Criteria.where("categoryId").in((Object[]) categoriesId));
+            criterias.add(Criteria.where("category.id").in((Object[]) categoriesId));
         }
     }
 }
