@@ -15,8 +15,6 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
-import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.TextScore;
 
 @Getter
@@ -65,9 +63,9 @@ public class Product {
     @LastModifiedBy
     private UUID lastModifiedByUserId;
 
-    @Field(name = "categoryId")
-    @DocumentReference
-    private Category category;
+    private UUID categoryId;
+
+    private ProductCategory category;
 
     private Integer discountPercentageRounded;
 
@@ -148,7 +146,8 @@ public class Product {
     public void setCategory(Category category) {
         Objects.requireNonNull(category);
 
-        this.category = category;
+        this.categoryId = category.getId();
+        this.category = ProductCategory.of(category);
     }
 
     public void disable() {
