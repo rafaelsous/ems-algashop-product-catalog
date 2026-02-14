@@ -12,6 +12,7 @@ import java.time.OffsetDateTime;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -65,7 +66,13 @@ public class ProductQueryServiceImpl implements ProductQueryService {
 
         List<AggregationOperation> operations = new ArrayList<>();
 
-        textCriteria.ifPresent(tc -> operations.add(Aggregation.match(tc)));
+    textCriteria.ifPresent(
+        tc -> {
+          operations.add(Aggregation.match(tc));
+          AggregationOperation addTextScoreField = _ -> new Document(
+                  "$addFields", new Document(SCORE_PROPERTY_NAME, new Document("$meta", "textScore")));
+          operations.add(addTextScoreField);
+        });
         criteria.ifPresent(c -> operations.add(Aggregation.match(c)));
 
         PageRequest pageRequest = PageRequest.of(filter.getPage(), filter.getSize());
@@ -128,19 +135,11 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     }
 
     private ProjectionOperation projectionForSummary() {
-        return project()
-                .and("_id").as("_id")
-                .and(CREATED_AT_PROPERTY_NAME).as(CREATED_AT_PROPERTY_NAME)
-                .and("name").as("name")
-                .and("brand").as("brand")
-                .and("regularPrice").as("regularPrice")
-                .and(SALE_PRICE_PROPERTY_NAME).as(SALE_PRICE_PROPERTY_NAME)
-                .and(ENABLED_PROPERTY_NAME).as(ENABLED_PROPERTY_NAME)
-                .and(QUANTITY_IN_STOCK_PROPERTY_NAME).as(QUANTITY_IN_STOCK_PROPERTY_NAME)
-                .and("discountPercentageRounded").as("discountPercentageRounded")
-                .and(SCORE_PROPERTY_NAME).as(SCORE_PROPERTY_NAME)
-                .and("category._id").as("category._id")
-                .and("category.name").as("category.name");
+        return project(ProductSummaryOutput.class)
+                .andExpression("salePrice < regularPrice").as("hasDiscount")
+                .andExpression("quantityInStock > 0").as("inStock")
+                .and(StringOperators.Substr.valueOf("description")
+                        .substring(0, 50)).as("shortDescription");
     }
 
     private static void filterByEnabled(Boolean isEnabled, List<CriteriaDefinition> criterias) {

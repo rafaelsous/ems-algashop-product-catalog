@@ -4,6 +4,8 @@ import com.rafaelsousa.algashop.product.catalog.application.category.query.Categ
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+
+import com.rafaelsousa.algashop.product.catalog.infrastructure.utility.Slugfier;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,10 +27,13 @@ public class ProductSummaryOutput {
     private String shortDescription;
     private CategoryMininalOutput category;
 
-    private String slug;
     private Boolean hasDiscount;
     private Integer quantityInStock;
     private Integer discountPercentageRounded;
 
     private Float score;
+
+    public String getSlug() {
+        return Slugfier.slugify(this.getName());
+    }
 }
