@@ -5,7 +5,7 @@ import com.rafaelsousa.algashop.product.catalog.application.category.management.
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryDetailOutput;
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryFilter;
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryQueryService;
-import com.rafaelsousa.algashop.product.catalog.application.product.query.PageModel;
+import com.rafaelsousa.algashop.product.catalog.application.PageModel;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,5 +1,6 @@
 package com.rafaelsousa.algashop.product.catalog.presentation.product;
 
+import com.rafaelsousa.algashop.product.catalog.application.PageModel;
 import com.rafaelsousa.algashop.product.catalog.application.product.management.ProductInput;
 import com.rafaelsousa.algashop.product.catalog.application.product.management.ProductManagementApplicationService;
 import com.rafaelsousa.algashop.product.catalog.application.product.query.*;

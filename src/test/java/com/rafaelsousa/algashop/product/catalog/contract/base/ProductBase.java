@@ -3,7 +3,8 @@ package com.rafaelsousa.algashop.product.catalog.contract.base;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.rafaelsousa.algashop.product.catalog.application.product.ResourceNotFoundException;
+import com.rafaelsousa.algashop.product.catalog.application.PageModel;
+import com.rafaelsousa.algashop.product.catalog.application.ResourceNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.application.product.management.ProductInput;
 import com.rafaelsousa.algashop.product.catalog.application.product.management.ProductManagementApplicationService;
 import com.rafaelsousa.algashop.product.catalog.application.product.query.*;

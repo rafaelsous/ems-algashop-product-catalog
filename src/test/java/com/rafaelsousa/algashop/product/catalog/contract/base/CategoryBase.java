@@ -9,7 +9,7 @@ import com.rafaelsousa.algashop.product.catalog.application.category.query.Categ
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryDetailOutputTestDataBuilder;
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryFilter;
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryQueryService;
-import com.rafaelsousa.algashop.product.catalog.application.product.query.PageModel;
+import com.rafaelsousa.algashop.product.catalog.application.PageModel;
 import com.rafaelsousa.algashop.product.catalog.presentation.category.CategoryController;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import java.nio.charset.StandardCharsets;

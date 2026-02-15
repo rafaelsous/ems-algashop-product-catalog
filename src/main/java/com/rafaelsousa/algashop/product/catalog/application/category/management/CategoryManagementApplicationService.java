@@ -1,9 +1,12 @@
 package com.rafaelsousa.algashop.product.catalog.application.category.management;
 
+import com.rafaelsousa.algashop.product.catalog.application.ApplicationMessagePublisher;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.Category;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryRepository;
 import java.util.UUID;
+
+import com.rafaelsousa.algashop.product.catalog.domain.model.category.event.CategoryUpdateEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CategoryManagementApplicationService {
     private final CategoryRepository categoryRepository;
+    private final ApplicationMessagePublisher applicationMessagePublisher;
 
     public UUID create(CategoryInput categoryInput) {
         Category category = new Category(categoryInput.getName(), categoryInput.getEnabled());
@@ -27,6 +31,9 @@ public class CategoryManagementApplicationService {
         category.setEnabled(categoryInput.getEnabled());
 
         categoryRepository.save(category);
+
+        applicationMessagePublisher.send(new CategoryUpdateEvent(category.getId(),
+                category.getName(), category.getEnabled()));
     }
 
     public void disable(UUID categoryId) {
@@ -36,5 +43,8 @@ public class CategoryManagementApplicationService {
         category.setEnabled(false);
 
         categoryRepository.save(category);
+
+        applicationMessagePublisher.send(new CategoryUpdateEvent(category.getId(),
+                category.getName(), category.getEnabled()));
     }
 }

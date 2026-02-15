@@ -2,6 +2,7 @@ package com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.prod
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
+import com.rafaelsousa.algashop.product.catalog.application.PageModel;
 import com.rafaelsousa.algashop.product.catalog.application.product.query.*;
 import com.rafaelsousa.algashop.product.catalog.application.utility.Mapper;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;

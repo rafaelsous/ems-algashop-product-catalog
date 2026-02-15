@@ -1,6 +1,6 @@
 package com.rafaelsousa.algashop.product.catalog.application.category.query;
 
-import com.rafaelsousa.algashop.product.catalog.application.product.query.PageModel;
+import com.rafaelsousa.algashop.product.catalog.application.PageModel;
 
 import java.util.UUID;
 

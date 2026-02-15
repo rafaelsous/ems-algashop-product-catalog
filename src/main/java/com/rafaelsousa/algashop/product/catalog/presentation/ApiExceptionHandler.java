@@ -1,6 +1,6 @@
 package com.rafaelsousa.algashop.product.catalog.presentation;
 
-import com.rafaelsousa.algashop.product.catalog.application.product.ResourceNotFoundException;
+import com.rafaelsousa.algashop.product.catalog.application.ResourceNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.DomainEntityNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.DomainException;
 import java.net.URI;

@@ -3,7 +3,7 @@ package com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.cate
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryDetailOutput;
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryFilter;
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryQueryService;
-import com.rafaelsousa.algashop.product.catalog.application.product.query.PageModel;
+import com.rafaelsousa.algashop.product.catalog.application.PageModel;
 import com.rafaelsousa.algashop.product.catalog.application.utility.Mapper;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.Category;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
