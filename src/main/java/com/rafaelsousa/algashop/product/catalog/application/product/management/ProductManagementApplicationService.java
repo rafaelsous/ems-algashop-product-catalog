@@ -77,7 +77,7 @@ public class ProductManagementApplicationService {
         product.setBrand(productInput.getBrand());
         product.setDescription(productInput.getDescription());
         product.setEnabled(productInput.getEnabled());
-        product.setRegularPrice(productInput.getRegularPrice());
-        product.setSalePrice(productInput.getSalePrice());
+
+        product.changePrice(productInput.getRegularPrice(), productInput.getSalePrice());
     }
 }

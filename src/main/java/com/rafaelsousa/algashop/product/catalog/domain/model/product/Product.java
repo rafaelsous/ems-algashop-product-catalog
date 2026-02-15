@@ -11,6 +11,7 @@ import java.util.UUID;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.*;
+import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
@@ -18,7 +19,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.TextScore;
 
 @Getter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Document(collection = "products")
 @CompoundIndex(name = "pidx_product_by_category_enabledTrue_salePrice",
@@ -27,7 +28,7 @@ import org.springframework.data.mongodb.core.mapping.TextScore;
 @CompoundIndex(name = "pidx_product_by_category_enabledTrue_createdAt",
         def = "{'category.id': 1, 'createdAt': -1}",
         partialFilter = "{'enabled': true}")
-public class Product {
+public class Product extends AbstractAggregateRoot<Product> {
 
     @Id
     @EqualsAndHashCode.Include
@@ -101,40 +102,6 @@ public class Product {
         this.brand = brand;
     }
 
-    public void setRegularPrice(BigDecimal regularPrice) {
-        Objects.requireNonNull(regularPrice);
-
-        if (regularPrice.signum() == -1) {
-            throw new IllegalArgumentException();
-        }
-
-        if (Objects.isNull(this.salePrice)) {
-            this.salePrice = regularPrice;
-        } else if (this.salePrice.compareTo(regularPrice) > 0) {
-            throw new DomainException("Sale price cannot be greater than regular price");
-        }
-
-        this.regularPrice = regularPrice;
-        this.calculateDiscountPercentageRounded();
-    }
-
-    public void setSalePrice(BigDecimal salePrice) {
-        Objects.requireNonNull(salePrice);
-
-        if (salePrice.signum() == -1) {
-            throw new IllegalArgumentException();
-        }
-
-        if (Objects.isNull(this.regularPrice)) {
-            this.regularPrice = salePrice;
-        } else if (salePrice.compareTo(this.regularPrice) > 0) {
-            throw new DomainException("Sale price cannot be greater than regular price");
-        }
-
-        this.salePrice = salePrice;
-        this.calculateDiscountPercentageRounded();
-    }
-
     public void setEnabled(Boolean enabled) {
         Objects.requireNonNull(enabled);
 
@@ -163,10 +130,57 @@ public class Product {
         return getDiscountPercentageRounded() != null && getDiscountPercentageRounded() > 0;
     }
 
+    public void changePrice(BigDecimal regularPrice, BigDecimal salePrice) {
+        Objects.requireNonNull(regularPrice);
+        Objects.requireNonNull(salePrice);
+
+        BigDecimal oldRegularPrice = this.regularPrice;
+        BigDecimal oldSalePrice = this.salePrice;
+
+        boolean wasOnSale = getHasDiscount();
+
+        if (this.salePrice.compareTo(regularPrice) > 0) {
+            throw new DomainException("Sale price cannot be greater than regular price");
+        }
+
+        setRegularPrice(regularPrice);
+        setSalePrice(salePrice);
+
+        if (pricesDidNotChange(oldRegularPrice, oldSalePrice)) return;
+
+        registerPriceChangedEvent(oldRegularPrice, oldSalePrice);
+
+        if (isNewlyOnSale(wasOnSale)) {
+            registerProductPlacedOnSale();
+        }
+    }
+
     private void setId(UUID id) {
         Objects.requireNonNull(id);
 
         this.id = id;
+    }
+
+    private void setRegularPrice(BigDecimal regularPrice) {
+        Objects.requireNonNull(regularPrice);
+
+        if (regularPrice.signum() == -1) {
+            throw new IllegalArgumentException();
+        }
+
+        this.regularPrice = regularPrice;
+        this.calculateDiscountPercentageRounded();
+    }
+
+    private void setSalePrice(BigDecimal salePrice) {
+        Objects.requireNonNull(salePrice);
+
+        if (salePrice.signum() == -1) {
+            throw new IllegalArgumentException();
+        }
+
+        this.salePrice = salePrice;
+        this.calculateDiscountPercentageRounded();
     }
 
     private void setQuantityInStock(Integer quantityInStock) {
@@ -190,5 +204,36 @@ public class Product {
                 .multiply(BigDecimal.valueOf(100))
                 .setScale(2, RoundingMode.HALF_UP)
                 .intValue();
+    }
+
+    private boolean pricesDidNotChange(BigDecimal oldRegularPrice, BigDecimal oldSalePrice) {
+        return Objects.equals(this.regularPrice, oldRegularPrice)
+                && Objects.equals(this.salePrice, oldSalePrice);
+    }
+
+    private void registerPriceChangedEvent(BigDecimal oldRegularPrice, BigDecimal oldSalePrice) {
+        super.registerEvent(
+                ProductPriceChangedEvent.builder()
+                        .productId(this.id)
+                        .newSalePrice(this.salePrice)
+                        .newRegularPrice(this.regularPrice)
+                        .oldSalePrice(oldSalePrice)
+                        .oldRegularPrice(oldRegularPrice)
+                    .build()
+        );
+    }
+
+    private boolean isNewlyOnSale(boolean wasOnSale) {
+        return getHasDiscount() && !wasOnSale;
+    }
+
+    private void registerProductPlacedOnSale() {
+        super.registerEvent(
+                ProductPlacedOnSaleEvent.builder()
+                        .productId(this.id)
+                        .regularPrice(this.regularPrice)
+                        .salePrice(this.salePrice)
+                    .build()
+        );
     }
 }
