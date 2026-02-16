@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.TextScore;
 
 @Getter
+@ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Document(collection = "products")
@@ -84,6 +85,8 @@ public class Product extends AbstractAggregateRoot<Product> {
         this.setSalePrice(salePrice);
         this.setQuantityInStock(0);
         this.setCategory(category);
+
+        super.registerEvent(ProductAddedEvent.builder().productId(this.id).build());
     }
 
     public void setName(String name) {
@@ -105,7 +108,14 @@ public class Product extends AbstractAggregateRoot<Product> {
     public void setEnabled(Boolean enabled) {
         Objects.requireNonNull(enabled);
 
+        Boolean wasEnabled = this.enabled;
         this.enabled = enabled;
+
+        if (wasEnabled != null && !wasEnabled && this.getEnabled()) {
+            this.registerEvent(ProductListedEvent.builder().productId(this.id).build());
+        } else if (wasEnabled != null && wasEnabled && !this.getEnabled()) {
+            this.registerEvent(ProductDelistedEvent.builder().productId(this.id).build());
+        }
     }
 
     public void setCategory(Category category) {
