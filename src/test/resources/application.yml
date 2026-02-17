@@ -1,0 +1,9 @@
+server.port: 8083
+
+spring:
+  profiles:
+    active: test
+    group:
+      test:
+        - base
+        - test-env

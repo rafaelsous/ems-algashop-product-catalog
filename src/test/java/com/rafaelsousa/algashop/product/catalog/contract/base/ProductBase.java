@@ -68,11 +68,11 @@ class ProductBase {
     private void mockFilterProducts() {
         when(productQueryService.filter(any(ProductFilter.class)))
                 .then(answer -> {
-                    Integer size = answer.getArgument(0);
+                    ProductFilter filter = answer.getArgument(0);
 
                     return PageModel.<ProductDetailOutput>builder()
                             .number(0)
-                            .size(size)
+                            .size(filter.getSize())
                             .totalElements(2)
                             .content(
                                     List.of(

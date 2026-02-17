@@ -56,11 +56,11 @@ class CategoryBase {
     private void mockFilterCategories() {
         when(productQueryService.filter(any(CategoryFilter.class)))
                 .then(answer -> {
-                    Integer size = answer.getArgument(0);
+                    CategoryFilter filter = answer.getArgument(0);
 
                     return PageModel.<CategoryDetailOutput>builder()
                             .number(0)
-                            .size(size)
+                            .size(filter.getSize())
                             .totalElements(2)
                             .content(
                                     List.of(

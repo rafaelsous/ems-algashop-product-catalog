@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.BsonArray;
 import org.bson.BsonDocument;
 import org.bson.Document;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -23,8 +24,8 @@ public class DataLoader implements ApplicationRunner {
     private final DataLoadProperties properties;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
-        if (!properties.getEnabled()) return;
+    public void run(@NonNull ApplicationArguments args) {
+        if (!properties.isEnabled()) return;
 
         log.info("Data load started");
         if ( CollectionUtils.isEmpty(properties.getSources())) {
@@ -67,7 +68,7 @@ public class DataLoader implements ApplicationRunner {
         if (CollectionUtils.isEmpty(mongoDocs)) return 0;
 
         try {
-            if (Boolean.TRUE.equals(properties.getAutoDelete())) {
+            if (properties.isAutoDelete()) {
                 mongoOperations.getCollection(collectionName).deleteMany(new BsonDocument());
             }
 

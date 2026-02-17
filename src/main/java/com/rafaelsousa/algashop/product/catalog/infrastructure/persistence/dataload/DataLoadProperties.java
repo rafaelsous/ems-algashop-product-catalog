@@ -17,10 +17,10 @@ import java.util.List;
 public class DataLoadProperties {
 
     @NotNull
-    private Boolean enabled;
+    private boolean enabled;
 
     @NotNull
-    private Boolean autoDelete;
+    private boolean autoDelete;
 
     @Valid
     private List<DataLoadSource> sources;
