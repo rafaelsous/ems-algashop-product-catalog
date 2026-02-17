@@ -1,5 +1,6 @@
 package com.rafaelsousa.algashop.product.catalog.domain.model.product;
 
+import com.rafaelsousa.algashop.product.catalog.domain.model.product.QuantityInStockAdjustment.Result;
 import com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.config.MongoConfig;
 import com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.dataload.DataLoadProperties;
 import com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.dataload.DataLoader;
@@ -79,4 +80,12 @@ class QuantityInStockAdjustmentIT {
 		Product product = productRepository.findById(EXISTING_PRODUCT_ID).orElseThrow();
 		assertThat(product.getQuantityInStock()).isEqualTo(50);
 	}
+
+    @Test
+    void shouldCalculateResult() {
+	    Result result = quantityInStockAdjustment.decrease(EXISTING_PRODUCT_ID, 40);
+
+	    assertThat(result.previousQuantity()).isEqualTo(50);
+	    assertThat(result.newQuantity()).isEqualTo(10);
+    }
 }

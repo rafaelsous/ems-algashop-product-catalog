@@ -1,12 +1,15 @@
 package com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.product;
 
-import com.mongodb.client.result.UpdateResult;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;
+import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.QuantityInStockAdjustment;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.bson.Document;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -15,37 +18,56 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class QuantityInStockAdjustmentMongoDBImpl implements QuantityInStockAdjustment {
+    public static final String QUANTITY_IN_STOCK_PROPERTY_NAME = "quantityInStock";
+
     private final MongoOperations mongoOperations;
 
     @Override
-    public void increase(UUID productId, int quantity) {
+    public Result increase(UUID productId, int quantity) {
         Query query = new Query(Criteria.where("id").is(productId));
-        changeStockQuantity(productId, quantity, query);
+
+        return changeStockQuantity(productId, quantity, query);
     }
 
     @Override
-    public void decrease(UUID productId, int quantity) {
+    public Result decrease(UUID productId, int quantity) {
         Query query = new Query(Criteria.where("id")
                 .is(productId)
-                .and("quantityInStock").gte(quantity)
+                .and(QUANTITY_IN_STOCK_PROPERTY_NAME).gte(quantity)
         );
 
-        changeStockQuantity(productId, quantity * -1, query);
+        return changeStockQuantity(productId, quantity * -1, query);
     }
 
-    private void changeStockQuantity(UUID productId, int quantity, Query query) {
+    private Result changeStockQuantity(UUID productId, int quantity, Query queryForUpdate) {
+        Aggregation findProductQuantity = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("id").is(productId)),
+                Aggregation.project(QUANTITY_IN_STOCK_PROPERTY_NAME)
+        );
+
+        Document productBeforeUpdate = mongoOperations
+                .aggregate(findProductQuantity, Product.class, Document.class).getUniqueMappedResult();
+
+        if (productBeforeUpdate == null) {
+            throw new ProductNotFoundException(productId);
+        }
+
+        Integer previousQuantity = productBeforeUpdate.getInteger(QUANTITY_IN_STOCK_PROPERTY_NAME);
+
         Update update = new Update()
-                .inc("quantityInStock", quantity)
+                .inc(QUANTITY_IN_STOCK_PROPERTY_NAME, quantity)
                 .inc("version", 1)
                 .set("updatedAt", OffsetDateTime.now());
 
-        UpdateResult updatedResult = mongoOperations.update(Product.class)
-                .matching(query)
-                .apply(update)
-                .first();
+        Product updatedProduct = mongoOperations.findAndModify(queryForUpdate, update, new FindAndModifyOptions()
+                .returnNew(true), Product.class);
 
-        if (updatedResult.getModifiedCount() < 1) {
-            throw new StockUpdateFailedException(String.format("Product of id %s was not found", productId));
+        if (updatedProduct == null) {
+            throw new StockUpdateFailedException(String.format("Failed to update stock of product %s", productId));
         }
+
+      Integer newQuantity = updatedProduct.getQuantityInStock();
+
+      return new Result(productId, previousQuantity, newQuantity);
     }
 }
