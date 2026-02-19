@@ -2,12 +2,14 @@ package com.rafaelsousa.algashop.product.catalog.domain.model.product;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Getter
 @Builder
+@ToString
 public class ProductSoldOutEvent {
 	private UUID productId;
 

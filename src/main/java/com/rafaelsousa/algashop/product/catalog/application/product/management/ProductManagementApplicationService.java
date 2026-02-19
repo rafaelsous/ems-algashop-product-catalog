@@ -6,6 +6,7 @@ import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryRe
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductRepository;
+import com.rafaelsousa.algashop.product.catalog.domain.model.product.StockService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 public class ProductManagementApplicationService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+
+	private final StockService stockService;
 
     public UUID create(ProductInput productInput) {
         Product product = mapToProduct(productInput);
@@ -47,6 +50,18 @@ public class ProductManagementApplicationService {
 
         productRepository.save(product);
     }
+
+	public void restock(UUID productId, Integer quantity) {
+		Product product = findProduct(productId);
+
+		stockService.restock(product, quantity);
+	}
+
+	public void withdraw(UUID productId, Integer quantity) {
+		Product product = findProduct(productId);
+
+		stockService.withdraw(product, quantity);
+	}
 
     private Product mapToProduct(ProductInput productInput) {
         Category category = findCategory(productInput.getCategoryId());

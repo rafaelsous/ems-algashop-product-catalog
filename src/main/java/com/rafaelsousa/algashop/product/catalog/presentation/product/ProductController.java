@@ -5,6 +5,7 @@ import com.rafaelsousa.algashop.product.catalog.application.product.management.P
 import com.rafaelsousa.algashop.product.catalog.application.product.management.ProductManagementApplicationService;
 import com.rafaelsousa.algashop.product.catalog.application.product.query.*;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
+import com.rafaelsousa.algashop.product.catalog.presentation.ProductQuantityModel;
 import com.rafaelsousa.algashop.product.catalog.presentation.UnprocessableContentException;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -61,4 +62,18 @@ public class ProductController {
     public void disable(@PathVariable("productId") UUID productId) {
         productManagementApplicationService.disable(productId);
     }
+
+	@PostMapping("/{productId}/restock")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void restock(@PathVariable("productId") UUID productId,
+	                    @RequestBody @Valid ProductQuantityModel productQuantityModel) {
+		productManagementApplicationService.restock(productId, productQuantityModel.getQuantity());
+	}
+
+	@PostMapping("/{productId}/withdraw")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void withdraw(@PathVariable("productId") UUID productId,
+	                    @RequestBody @Valid ProductQuantityModel productQuantityModel) {
+		productManagementApplicationService.withdraw(productId, productQuantityModel.getQuantity());
+	}
 }

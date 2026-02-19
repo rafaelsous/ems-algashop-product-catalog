@@ -1,6 +1,7 @@
 package com.rafaelsousa.algashop.product.catalog.infrastructure.message;
 
 import com.rafaelsousa.algashop.product.catalog.domain.model.DomainEventPublisher;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -8,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class DomainEventPublisherConfig {
 
     @Bean
-    public DomainEventPublisher domainEventPublisher(DomainEventPublisher domainEventPublisher) {
-        return domainEventPublisher::publishEvent;
+    public DomainEventPublisher domainEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        return applicationEventPublisher::publishEvent;
     }
 }

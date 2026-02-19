@@ -1,6 +1,7 @@
 package com.rafaelsousa.algashop.product.catalog.domain.model.product;
 
 import com.rafaelsousa.algashop.product.catalog.domain.model.DomainEventPublisher;
+import com.rafaelsousa.algashop.product.catalog.domain.model.DomainException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.QuantityInStockAdjustment.Result;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,12 @@ public class StockService {
 			throw new IllegalArgumentException();
 		}
 
-		Result result = quantityInStockAdjustment.increase(product.getId(), quantity);
+		Result result;
+		try {
+			result = quantityInStockAdjustment.increase(product.getId(), quantity);
+		} catch (Exception _) {
+            throw new DomainException(String.format("Failed to restock product %s on stock", product.getId()));
+		}
 
 		if (result.inRestocked()) {
 			domainEventPublisher.publishEvent(ProductRestockedEvent.builder()
@@ -35,7 +41,12 @@ public class StockService {
 			throw new IllegalArgumentException();
 		}
 
-		Result result = quantityInStockAdjustment.decrease(product.getId(), quantity);
+		Result result;
+		try {
+			result = quantityInStockAdjustment.decrease(product.getId(), quantity);
+		} catch (Exception _) {
+			throw new DomainException(String.format("Failed to withdrawn product %s from stock", product.getId()));
+		}
 
 		if (result.isOutOfStock()) {
 			domainEventPublisher.publishEvent(ProductSoldOutEvent.builder()
