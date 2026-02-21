@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +50,7 @@ public class ProductManagementApplicationService {
         productRepository.save(product);
     }
 
+	@Transactional
 	public void restock(UUID productId, Integer quantity) {
 		Product product = findProduct(productId);
 
@@ -56,6 +58,7 @@ public class ProductManagementApplicationService {
 		stockMovementRepository.save(stockMovement);
 	}
 
+	@Transactional
 	public void withdraw(UUID productId, Integer quantity) {
 		Product product = findProduct(productId);
 
