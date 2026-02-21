@@ -3,10 +3,7 @@ package com.rafaelsousa.algashop.product.catalog.application.product.management;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.Category;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryRepository;
-import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;
-import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductNotFoundException;
-import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductRepository;
-import com.rafaelsousa.algashop.product.catalog.domain.model.product.StockService;
+import com.rafaelsousa.algashop.product.catalog.domain.model.product.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class ProductManagementApplicationService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+	private final StockMovementRepository stockMovementRepository;
 
 	private final StockService stockService;
 
@@ -54,13 +52,15 @@ public class ProductManagementApplicationService {
 	public void restock(UUID productId, Integer quantity) {
 		Product product = findProduct(productId);
 
-		stockService.restock(product, quantity);
+		StockMovement stockMovement = stockService.restock(product, quantity);
+		stockMovementRepository.save(stockMovement);
 	}
 
 	public void withdraw(UUID productId, Integer quantity) {
 		Product product = findProduct(productId);
 
-		stockService.withdraw(product, quantity);
+		StockMovement stockMovement = stockService.withdraw(product, quantity);
+		stockMovementRepository.save(stockMovement);
 	}
 
     private Product mapToProduct(ProductInput productInput) {
