@@ -50,7 +50,7 @@ Contract.make {
         }
         body([
                 id          : fromRequest().path(3),
-                addedAt     : anyIso8601WithOffset(),
+                createdAt   : anyIso8601WithOffset(),
                 name        : fromRequest().body('$.name'),
                 brand       : fromRequest().body('$.brand'),
                 regularPrice: fromRequest().body('$.regularPrice'),

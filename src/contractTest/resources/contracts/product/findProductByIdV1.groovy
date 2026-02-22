@@ -17,7 +17,7 @@ Contract.make {
         }
         body([
                 id          : fromRequest().path(3),
-                addedAt     : anyIso8601WithOffset(),
+                createdAt   : anyIso8601WithOffset(),
                 name        : "Notebook X11",
                 brand       : "Deep Diver",
                 regularPrice: 1500.00,

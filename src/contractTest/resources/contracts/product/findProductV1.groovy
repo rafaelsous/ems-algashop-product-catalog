@@ -27,7 +27,7 @@ Contract.make {
                     content: [
                             [
                                     id          : anyUuid(),
-                                    addedAt     : anyIso8601WithOffset(),
+                                    createdAt   : anyIso8601WithOffset(),
                                     name        : "Notebook X11",
                                     brand       : "Deep Diver",
                                     regularPrice: 1500.00,
@@ -42,7 +42,7 @@ Contract.make {
                             ],
                             [
                                     id          : anyUuid(),
-                                    addedAt     : anyIso8601WithOffset(),
+                                    createdAt   : anyIso8601WithOffset(),
                                     name        : "Interruptor",
                                     brand       : "Tramontina",
                                     regularPrice: 150.00,

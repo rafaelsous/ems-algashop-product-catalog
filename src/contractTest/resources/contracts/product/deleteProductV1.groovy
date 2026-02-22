@@ -7,10 +7,7 @@ import org.springframework.http.MediaType
 Contract.make {
     request {
         method DELETE()
-        headers {
-            accept MediaType.APPLICATION_JSON_VALUE
-        }
-        url("/api/v1/products/0199c60b-0dce-7fee-9ef2-d6dc30a8e3fa")
+        url("/api/v1/products/0199c60b-0dce-7fee-9ef2-d6dc30a8e3fa/enable")
     }
     response {
         status HttpStatus.NO_CONTENT.value()
