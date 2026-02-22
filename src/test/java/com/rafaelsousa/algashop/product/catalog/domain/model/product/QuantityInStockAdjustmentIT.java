@@ -1,5 +1,6 @@
 package com.rafaelsousa.algashop.product.catalog.domain.model.product;
 
+import com.rafaelsousa.algashop.product.catalog.TestcontainerMongoDBConfig;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.QuantityInStockAdjustment.Result;
 import com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.config.MongoConfig;
 import com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.dataload.DataLoadProperties;
@@ -22,8 +23,10 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 		MongoConfig.class,
 		DataLoader.class,
 		DataLoadProperties.class,
-		QuantityInStockAdjustmentMongoDBImpl.class
+		QuantityInStockAdjustmentMongoDBImpl.class,
+		TestcontainerMongoDBConfig.class
 })
+//@Transactional
 class QuantityInStockAdjustmentIT {
 	private static final UUID EXISTING_PRODUCT_ID = UUID.fromString("946cea3b-d11d-4f11-b88d-3089b4e74087");
 
