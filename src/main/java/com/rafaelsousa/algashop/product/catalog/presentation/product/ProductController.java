@@ -8,12 +8,17 @@ import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryNo
 import com.rafaelsousa.algashop.product.catalog.presentation.ProductQuantityModel;
 import com.rafaelsousa.algashop.product.catalog.presentation.UnprocessableContentException;
 import jakarta.validation.Valid;
+
+import java.time.Duration;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin("*")
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/products")
 public class ProductController {
@@ -21,8 +26,14 @@ public class ProductController {
     private final ProductManagementApplicationService productManagementApplicationService;
 
     @GetMapping("/{productId}")
-    public ProductDetailOutput findById(@PathVariable("productId") UUID productId) {
-        return productQueryService.findById(productId);
+    public ResponseEntity<ProductDetailOutput> findById(@PathVariable("productId") UUID productId) {
+	    ProductDetailOutput product = productQueryService.findById(productId);
+
+    return ResponseEntity.ok()
+		    .cacheControl(CacheControl.maxAge(Duration.ofMinutes(1)).cachePublic())
+		    .eTag("product:id:" + product.getId() + ":v:" + product.getVersion())
+		    .lastModified(product.getUpdatedAt().toInstant())
+		    .body(product);
     }
 
     @PostMapping
