@@ -6,13 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryMininalOutput {
+public class CategoryMininalOutput implements Serializable {
     private UUID id;
     private String name;
     private Boolean enabled;
