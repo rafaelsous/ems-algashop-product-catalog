@@ -39,15 +39,11 @@ public class ProductController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProductDetailOutput create(@RequestBody @Valid ProductInput productInput) {
-        UUID productId;
-
         try {
-            productId = productManagementApplicationService.create(productInput);
+            return productManagementApplicationService.create(productInput);
         } catch (CategoryNotFoundException ex) {
             throw new UnprocessableContentException(ex.getMessage(), ex);
         }
-
-        return productQueryService.findById(productId);
     }
 
     @GetMapping
@@ -57,9 +53,7 @@ public class ProductController {
 
     @PutMapping("/{productId}")
     public ProductDetailOutput update(@PathVariable("productId") UUID productId, @RequestBody @Valid ProductInput productInput) {
-        productManagementApplicationService.update(productId, productInput);
-
-        return productQueryService.findById(productId);
+        return productManagementApplicationService.update(productId, productInput);
     }
 
     @PutMapping("/{productId}/enable")

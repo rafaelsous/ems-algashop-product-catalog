@@ -84,14 +84,14 @@ class ProductBase {
     }
 
     private void mockCreateProduct() {
+	    ProductDetailOutput productDetailOutput = ProductDetailOutputTestDataBuilder.aProduct()
+			    .id(createdProductId).inStock(false).build();
+
         when(productManagementApplicationService.create(any(ProductInput.class)))
-                .thenReturn(createdProductId);
+                .thenReturn(productDetailOutput);
 
         when(productQueryService.findById(createdProductId))
-                .thenReturn(ProductDetailOutputTestDataBuilder.aProduct()
-                        .id(createdProductId)
-                        .inStock(false)
-                        .build());
+                .thenReturn(productDetailOutput);
     }
 
     private void mockInvalidProductFindById() {

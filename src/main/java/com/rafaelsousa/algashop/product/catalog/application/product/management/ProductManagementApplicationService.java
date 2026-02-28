@@ -1,5 +1,7 @@
 package com.rafaelsousa.algashop.product.catalog.application.product.management;
 
+import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductDetailOutput;
+import com.rafaelsousa.algashop.product.catalog.application.utility.Mapper;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.Category;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryRepository;
@@ -7,6 +9,7 @@ import com.rafaelsousa.algashop.product.catalog.domain.model.product.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,16 +20,19 @@ public class ProductManagementApplicationService {
     private final CategoryRepository categoryRepository;
 	private final StockMovementRepository stockMovementRepository;
 
+	private final Mapper mapper;
 	private final StockService stockService;
 
-    public UUID create(ProductInput productInput) {
+	@CachePut(cacheNames = "algashop:products:v1", key = "#result.id", condition = "#productInput.enabled == true")
+    public ProductDetailOutput create(ProductInput productInput) {
         Product product = mapToProduct(productInput);
         productRepository.save(product);
 
-        return product.getId();
+        return mapper.convert(product, ProductDetailOutput.class);
     }
 
-    public void update(UUID productId, ProductInput productInput) {
+	@CachePut(cacheNames = "algashop:products:v1", key = "#result.id", condition = "#productInput.enabled == true")
+    public ProductDetailOutput update(UUID productId, ProductInput productInput) {
         Product product = findProduct(productId);
         Category category = findCategory(productInput.getCategoryId());
 
@@ -34,6 +40,8 @@ public class ProductManagementApplicationService {
         product.setCategory(category);
 
         productRepository.save(product);
+
+		return mapper.convert(product, ProductDetailOutput.class);
     }
 
     public void disable(UUID productId) {
