@@ -8,6 +8,8 @@ import java.util.UUID;
 
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.event.CategoryUpdateEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,6 +18,7 @@ public class CategoryManagementApplicationService {
     private final CategoryRepository categoryRepository;
     private final ApplicationMessagePublisher applicationMessagePublisher;
 
+	@CacheEvict(value = "algashop:categories-filter:v1", key = "'default'")
     public UUID create(CategoryInput categoryInput) {
         Category category = new Category(categoryInput.getName(), categoryInput.getEnabled());
         categoryRepository.save(category);
@@ -23,6 +26,10 @@ public class CategoryManagementApplicationService {
         return category.getId();
     }
 
+	@Caching(evict = {
+		@CacheEvict(value = "algashop:categories-filter:v1", key = "'default'"),
+		@CacheEvict(value = "algashop:categories:v1", key = "#categoryId")
+	})
     public void update(UUID categoryId, CategoryInput categoryInput) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(categoryId));
