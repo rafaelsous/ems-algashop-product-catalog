@@ -14,6 +14,7 @@ import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -38,6 +39,7 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     private final MongoOperations mongoOperations;
 
     @Override
+    @Cacheable(cacheNames = "algashop:products:v1", key = "#productId")
     public ProductDetailOutput findById(UUID productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));

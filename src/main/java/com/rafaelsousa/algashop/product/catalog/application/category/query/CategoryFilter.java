@@ -2,10 +2,11 @@ package com.rafaelsousa.algashop.product.catalog.application.category.query;
 
 import com.rafaelsousa.algashop.product.catalog.application.utility.SortablePageFilter;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.domain.Sort;
 
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -22,6 +23,25 @@ public class CategoryFilter extends SortablePageFilter<CategoryFilter.SortType> 
     public Sort.Direction getSortDirectionOrDefault() {
         return getSortDirection() == null ? Sort.Direction.ASC : getSortDirection();
     }
+
+	public boolean isCacheable() {
+		return isDefaultFilter();
+	}
+
+	private boolean isDefaultFilter() {
+		return this.equals(defaultFilter());
+	}
+
+	public static CategoryFilter defaultFilter() {
+		return CategoryFilter.builder()
+				.name(null)
+				.enabled(true)
+				.page(0)
+				.size(15)
+				.sortDirection(Sort.Direction.ASC)
+				.sortByProperty(SortType.NAME)
+				.build();
+	}
 
     @Getter
     @RequiredArgsConstructor
