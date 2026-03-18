@@ -27,9 +27,15 @@ public class ProductController {
 
     @GetMapping("/{productId}")
     public ResponseEntity<ProductDetailOutput> findById(@PathVariable("productId") UUID productId) {
+	    if (Math.random() < 0.5) {
+		    try {
+				Thread.sleep(Duration.ofSeconds(20));
+		    } catch (Exception ex) {}
+	    }
+
 	    ProductDetailOutput product = productQueryService.findById(productId);
 
-    return ResponseEntity.ok()
+        return ResponseEntity.ok()
 		    .cacheControl(CacheControl.maxAge(Duration.ofMinutes(1)).cachePublic())
 		    .eTag("product:id:" + product.getId() + ":v:" + product.getVersion())
 		    .lastModified(product.getUpdatedAt().toInstant())
