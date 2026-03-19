@@ -40,10 +40,16 @@ public class ProductController {
     private final ProductManagementApplicationService productManagementApplicationService;
 
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductDetailOutput> findById(@PathVariable("productId") UUID productId)
-		    throws InterruptedException {
+    public ResponseEntity<ProductDetailOutput> findById(@PathVariable("productId") UUID productId) {
+
+		if (productId.equals(UUID.fromString("946cea3b-d11d-4f11-b88d-3089b4e74087"))) {
+			return ResponseEntity.badRequest().build();
+		}
+
 	    if (Math.random() < 0.6) {
-		    Thread.sleep(Duration.ofSeconds(20));
+		    try {
+			    Thread.sleep(Duration.ofSeconds(20));
+		    } catch (Exception _) {}
 	    }
 
 	    ProductDetailOutput product = productQueryService.findById(productId);
