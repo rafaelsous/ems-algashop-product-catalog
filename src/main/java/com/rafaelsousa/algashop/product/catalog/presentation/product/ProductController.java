@@ -3,7 +3,10 @@ package com.rafaelsousa.algashop.product.catalog.presentation.product;
 import com.rafaelsousa.algashop.product.catalog.application.PageModel;
 import com.rafaelsousa.algashop.product.catalog.application.product.management.ProductInput;
 import com.rafaelsousa.algashop.product.catalog.application.product.management.ProductManagementApplicationService;
-import com.rafaelsousa.algashop.product.catalog.application.product.query.*;
+import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductDetailOutput;
+import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductFilter;
+import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductQueryService;
+import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductSummaryOutput;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.presentation.ProductQuantityModel;
 import com.rafaelsousa.algashop.product.catalog.presentation.UnprocessableContentException;
@@ -12,11 +15,22 @@ import jakarta.validation.Valid;
 import java.time.Duration;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @CrossOrigin("*")
 @RequiredArgsConstructor
@@ -26,11 +40,10 @@ public class ProductController {
     private final ProductManagementApplicationService productManagementApplicationService;
 
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductDetailOutput> findById(@PathVariable("productId") UUID productId) {
-	    if (Math.random() < 0.8) {
-		    try {
-				Thread.sleep(Duration.ofSeconds(20));
-		    } catch (Exception ex) {}
+    public ResponseEntity<ProductDetailOutput> findById(@PathVariable("productId") UUID productId)
+		    throws InterruptedException {
+	    if (Math.random() < 0.3) {
+		    Thread.sleep(Duration.ofSeconds(20));
 	    }
 
 	    ProductDetailOutput product = productQueryService.findById(productId);
