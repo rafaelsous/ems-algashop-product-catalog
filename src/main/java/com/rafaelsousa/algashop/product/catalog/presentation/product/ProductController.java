@@ -42,7 +42,7 @@ public class ProductController {
     @GetMapping("/{productId}")
     public ResponseEntity<ProductDetailOutput> findById(@PathVariable("productId") UUID productId)
 		    throws InterruptedException {
-	    if (Math.random() < 0.3) {
+	    if (Math.random() < 0.6) {
 		    Thread.sleep(Duration.ofSeconds(20));
 	    }
 
