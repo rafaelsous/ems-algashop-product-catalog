@@ -34,15 +34,16 @@ public class UploadManagementApplicationService {
 				.contentType(mediaType)
 				.contentLength(uploadInput.getContentLength())
 				.expiresIn(Duration.ofMinutes(5))
+				.allowPublicRead(true)
 				.build();
 
 		URL preSignedUrl = storageProvider.requestUploadUrl(fileReference);
-        OffsetDateTime expiresAt = OffsetDateTime.now().plus(fileReference.expiresIn());
+        OffsetDateTime expiresAt = OffsetDateTime.now().plus(fileReference.getExpiresIn());
 
 	    return UploadOutput.builder()
-	        .remoteFileName(fileReference.fileName())
-	        .contentLength(fileReference.contentLength())
-	        .contentType(fileReference.contentType().toString())
+	        .remoteFileName(fileReference.getFileName())
+	        .contentLength(fileReference.getContentLength())
+	        .contentType(fileReference.getContentType().toString())
 	        .uploadSignedUrl(preSignedUrl.toString())
 	        .expiresAt(expiresAt)
 	        .build();

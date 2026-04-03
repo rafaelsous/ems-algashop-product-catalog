@@ -2,14 +2,14 @@ package com.rafaelsousa.algashop.product.catalog.infrastructure.storage.s3;
 
 import com.rafaelsousa.algashop.product.catalog.application.storage.FileReference;
 import com.rafaelsousa.algashop.product.catalog.application.storage.StorageProvider;
+import io.awspring.cloud.s3.ObjectMetadata;
+import io.awspring.cloud.s3.S3Exception;
 import io.awspring.cloud.s3.S3Template;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
-import java.net.URI;
 import java.net.URL;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -21,7 +21,7 @@ public class StorageProviderAwsS3Impl implements StorageProvider {
 	public boolean healthCheck() {
 		try {
 			return s3Template.bucketExists(storageProviderAwsS3Properties.getBucketName());
-		} catch (Exception ex) {
+		} catch (Exception _) {
 			return false;
 		}
 	}
@@ -29,8 +29,25 @@ public class StorageProviderAwsS3Impl implements StorageProvider {
 	@Override
 	@SneakyThrows
 	public URL requestUploadUrl(FileReference fileReference) {
-        return URI.create(String.format("http://localhost:4566/%s?token=%s"
-		        , fileReference.fileName(), UUID.randomUUID())).toURL();
+		String bucketName = storageProviderAwsS3Properties.getBucketName();
+		String key = fileReference.getFileName();
+
+		if (fileExists(key)) {
+			throw new StorageProviderException(String.format("Remote file %s already exists", key));
+        }
+
+		ObjectMetadata.Builder metadataBuilder = ObjectMetadata.builder();
+
+		if (fileReference.isAllowPublicRead()) {
+			metadataBuilder.acl("public-read");
+		}
+
+		try {
+			return s3Template.createSignedPutURL(bucketName, key, fileReference.getExpiresIn(), metadataBuilder.build(),
+					fileReference.getContentType().toString());
+		} catch (S3Exception ex) {
+            throw new StorageProviderException(String.format("Unknown error when tried to create presigned URL for file %s", key), ex);
+		}
 	}
 
 	@Override
@@ -40,6 +57,6 @@ public class StorageProviderAwsS3Impl implements StorageProvider {
 
 	@Override
 	public boolean fileExists(String remoteFileName) {
-		return !remoteFileName.equals("fail.jpg");
+		return s3Template.objectExists(storageProviderAwsS3Properties.getBucketName(), remoteFileName);
 	}
 }
