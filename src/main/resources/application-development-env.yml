@@ -1,8 +1,10 @@
 spring:
   cache:
     type: redis
+
   mongodb:
     uri: mongodb://localhost:27017,localhost:27018,localhost:27019/product_catalog?replicaSet=rs0
+
   data:
     redis:
       host: localhost
@@ -10,6 +12,7 @@ spring:
       password: algashop
       database: 0
       timeout: 30
+
   cloud:
     aws:
       region:
@@ -21,6 +24,13 @@ spring:
       s3:
         enabled: true
         path-style-access-enabled: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://127.0.0.1:8081
+#          jwk-set-uri: http://127.0.0.1:8081/oauth2/jwks
 
 logging:
   level:
