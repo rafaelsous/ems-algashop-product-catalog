@@ -20,6 +20,8 @@ public class ProductCatalogSecurityConfig {
 			.cors(AbstractHttpConfigurer::disable)
 			.sessionManagement(sessionManagement ->
 				sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+			.authorizeHttpRequests(authorizeRequests ->
+				authorizeRequests.requestMatchers("/actuator/health/**").permitAll())
 			.authorizeHttpRequests(auth ->
 				auth.anyRequest().authenticated())
 			.oauth2ResourceServer(oauth2 ->
