@@ -19,7 +19,6 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @RestController
-@CrossOrigin("*")
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/categories")
 public class CategoryController {
