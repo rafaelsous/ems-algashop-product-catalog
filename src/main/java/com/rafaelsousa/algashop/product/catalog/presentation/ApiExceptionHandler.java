@@ -11,9 +11,11 @@ import java.util.stream.Collectors;
 import com.rafaelsousa.algashop.product.catalog.infrastructure.storage.s3.StorageProviderException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.*;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,8 +32,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     private final MessageSource messageSource;
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-              HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+			MethodArgumentNotValidException ex, @NonNull HttpHeaders headers, @NonNull HttpStatusCode status,
+			@NonNull WebRequest request) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(status);
         problemDetail.setTitle("Invalid fields");
         problemDetail.setDetail("One or more fields are invalid");
@@ -69,4 +72,24 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         return problemDetail;
     }
+
+	@ExceptionHandler(AuthorizationDeniedException.class)
+	public ProblemDetail handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
+		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+		problemDetail.setType(URI.create("/errors/forbidden"));
+		problemDetail.setTitle("Forbidden");
+		problemDetail.setProperty(TIMESTAMP_PROPERTY_NAME, OffsetDateTime.now());
+
+		return problemDetail;
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ProblemDetail handleAllExceptions(Exception ex) {
+		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+		problemDetail.setType(URI.create("/errors/internal-server-error"));
+		problemDetail.setTitle("Internal server error");
+		problemDetail.setProperty(TIMESTAMP_PROPERTY_NAME, OffsetDateTime.now());
+
+		return problemDetail;
+	}
 }

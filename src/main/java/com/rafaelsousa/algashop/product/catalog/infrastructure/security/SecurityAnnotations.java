@@ -23,4 +23,14 @@ public class SecurityAnnotations {
 	@Target({ElementType.METHOD, ElementType.TYPE})
 	@PreAuthorize("hasAuthority('SCOPE_products:stock:write')")
 	public @interface CanWriteProductsStock {}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.METHOD, ElementType.TYPE})
+	@PreAuthorize("hasAuthority('SCOPE_categories:read')")
+	public @interface CanReadCategories {}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.METHOD, ElementType.TYPE})
+	@PreAuthorize("hasAuthority('SCOPE_categories:write')")
+	public @interface CanWriteCategories {}
 }
