@@ -84,11 +84,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	@ExceptionHandler(Exception.class)
-	public ProblemDetail handleAllExceptions(Exception ex) {
-		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-		problemDetail.setType(URI.create("/errors/internal-server-error"));
+	public ProblemDetail handleException(Exception ex) {
+		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
+				"An unexpected internal server error occurred. Please try again and if the problem persists, contact the system administrator.");
 		problemDetail.setTitle("Internal server error");
+		problemDetail.setType(URI.create("/errors/internal"));
 		problemDetail.setProperty(TIMESTAMP_PROPERTY_NAME, OffsetDateTime.now());
+
+		log.error(ex.getMessage(), ex);
 
 		return problemDetail;
 	}
