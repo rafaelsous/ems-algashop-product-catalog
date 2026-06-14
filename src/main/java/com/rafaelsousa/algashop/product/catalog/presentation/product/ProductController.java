@@ -42,7 +42,7 @@ public class ProductController {
 
     @GetMapping("/{productId}")
     @CanReadProducts
-    public ResponseEntity<ProductDetailOutput> findById(@PathVariable("productId") UUID productId) {
+    public ResponseEntity<ProductDetailOutput> findById(@PathVariable UUID productId) {
 	    ProductDetailOutput product = productQueryService.findById(productId);
 
         return ResponseEntity.ok()
@@ -71,37 +71,35 @@ public class ProductController {
 
     @PutMapping("/{productId}")
     @CanWriteProducts
-    public ProductDetailOutput update(@PathVariable("productId") UUID productId, @RequestBody @Valid ProductInput productInput) {
+    public ProductDetailOutput update(@PathVariable UUID productId, @RequestBody @Valid ProductInput productInput) {
         return productManagementApplicationService.update(productId, productInput);
     }
 
     @PutMapping("/{productId}/enable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @CanWriteProducts
-    public void enable(@PathVariable("productId") UUID productId) {
+    public void enable(@PathVariable UUID productId) {
         productManagementApplicationService.enable(productId);
     }
 
     @DeleteMapping("/{productId}/enable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @CanWriteProducts
-    public void disable(@PathVariable("productId") UUID productId) {
+    public void disable(@PathVariable UUID productId) {
         productManagementApplicationService.disable(productId);
     }
 
 	@PostMapping("/{productId}/restock")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@CanWriteProductsStock
-	public void restock(@PathVariable("productId") UUID productId,
-	                    @RequestBody @Valid ProductQuantityModel productQuantityModel) {
+	public void restock(@PathVariable UUID productId, @RequestBody @Valid ProductQuantityModel productQuantityModel) {
 		productManagementApplicationService.restock(productId, productQuantityModel.getQuantity());
 	}
 
 	@PostMapping("/{productId}/withdraw")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@CanWriteProductsStock
-	public void withdraw(@PathVariable("productId") UUID productId,
-	                    @RequestBody @Valid ProductQuantityModel productQuantityModel) {
+	public void withdraw(@PathVariable UUID productId, @RequestBody @Valid ProductQuantityModel productQuantityModel) {
 		productManagementApplicationService.withdraw(productId, productQuantityModel.getQuantity());
 	}
 }

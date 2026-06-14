@@ -21,7 +21,7 @@ public class SecurityAnnotations {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.METHOD, ElementType.TYPE})
-	@PreAuthorize("hasAuthority('SCOPE_products:stock:write')")
+	@PreAuthorize("hasAuthority('SCOPE_products:stock:write') and hasRole('MANAGER')")
 	public @interface CanWriteProductsStock {}
 
 	@Retention(RetentionPolicy.RUNTIME)
