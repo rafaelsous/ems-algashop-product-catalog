@@ -8,9 +8,9 @@ import com.rafaelsousa.algashop.product.catalog.application.product.query.Produc
 import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductQueryService;
 import com.rafaelsousa.algashop.product.catalog.application.product.query.ProductSummaryOutput;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
-import com.rafaelsousa.algashop.product.catalog.infrastructure.security.SecurityAnnotations.CanReadProducts;
-import com.rafaelsousa.algashop.product.catalog.infrastructure.security.SecurityAnnotations.CanWriteProductsStock;
-import com.rafaelsousa.algashop.product.catalog.infrastructure.security.SecurityAnnotations.CanWriteProducts;
+import com.rafaelsousa.algashop.product.catalog.infrastructure.security.check.SecurityAnnotations.CanReadProducts;
+import com.rafaelsousa.algashop.product.catalog.infrastructure.security.check.SecurityAnnotations.CanWriteProductsStock;
+import com.rafaelsousa.algashop.product.catalog.infrastructure.security.check.SecurityAnnotations.CanWriteProducts;
 import com.rafaelsousa.algashop.product.catalog.presentation.ProductQuantityModel;
 import com.rafaelsousa.algashop.product.catalog.presentation.UnprocessableContentException;
 import jakarta.validation.Valid;

@@ -6,8 +6,8 @@ import com.rafaelsousa.algashop.product.catalog.application.category.management.
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryDetailOutput;
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryFilter;
 import com.rafaelsousa.algashop.product.catalog.application.category.query.CategoryQueryService;
-import com.rafaelsousa.algashop.product.catalog.infrastructure.security.SecurityAnnotations.CanReadCategories;
-import com.rafaelsousa.algashop.product.catalog.infrastructure.security.SecurityAnnotations.CanWriteCategories;
+import com.rafaelsousa.algashop.product.catalog.infrastructure.security.check.SecurityAnnotations.CanReadCategories;
+import com.rafaelsousa.algashop.product.catalog.infrastructure.security.check.SecurityAnnotations.CanWriteCategories;
 import jakarta.validation.Valid;
 import java.time.Duration;
 import java.time.OffsetDateTime;
