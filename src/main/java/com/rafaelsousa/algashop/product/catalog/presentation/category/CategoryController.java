@@ -28,24 +28,25 @@ public class CategoryController {
 
     @GetMapping
     @CanReadCategories
-    public ResponseEntity<PageModel<CategoryDetailOutput>> filter(CategoryFilter filter, WebRequest webRequest) {
-	    if (!filter.isCacheable()) {
-		    PageModel<CategoryDetailOutput> result = categoryQueryService.filter(filter);
-		    return ResponseEntity.ok(result);
-	    }
+    public ResponseEntity<PageModel<CategoryDetailOutput>> filter(
+            CategoryFilter filter, WebRequest webRequest) {
+        if (!filter.isCacheable()) {
+            PageModel<CategoryDetailOutput> result = categoryQueryService.filter(filter);
+            return ResponseEntity.ok(result);
+        }
 
-		OffsetDateTime lastModified = categoryQueryService.lastModified();
+        OffsetDateTime lastModified = categoryQueryService.lastModified();
 
-	    if (webRequest.checkNotModified(lastModified.toInstant().toEpochMilli())) {
-		    return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-	    }
+        if (webRequest.checkNotModified(lastModified.toInstant().toEpochMilli())) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
 
-	    PageModel<CategoryDetailOutput> result = categoryQueryService.filter(filter);
+        PageModel<CategoryDetailOutput> result = categoryQueryService.filter(filter);
 
-	    return ResponseEntity.ok()
-			    .cacheControl(CacheControl.maxAge(Duration.ofMinutes(5)).cachePublic())
-			    .lastModified(lastModified.toInstant())
-			    .body(result);
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(Duration.ofMinutes(5)).cachePublic())
+                .lastModified(lastModified.toInstant())
+                .body(result);
     }
 
     @PostMapping
@@ -59,19 +60,24 @@ public class CategoryController {
 
     @GetMapping("/{categoryId}")
     @CanReadCategories
-    public ResponseEntity<CategoryDetailOutput> findById(@PathVariable("categoryId") UUID categoryId) {
-	    CategoryDetailOutput categoryDetailOutput = categoryQueryService.findById(categoryId);
+    public ResponseEntity<CategoryDetailOutput> findById(@PathVariable UUID categoryId) {
+        CategoryDetailOutput categoryDetailOutput = categoryQueryService.findById(categoryId);
 
-		return ResponseEntity.ok()
-				.cacheControl(CacheControl.maxAge(Duration.ofMinutes(5)).cachePublic())
-			    .eTag("category:id:" + categoryDetailOutput.getId() + ":v:" + categoryDetailOutput.getVersion())
-			    .lastModified(categoryDetailOutput.getUpdatedAt().toInstant())
-			    .body(categoryDetailOutput);
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(Duration.ofMinutes(5)).cachePublic())
+                .eTag(
+                        "category:id:"
+                                + categoryDetailOutput.getId()
+                                + ":v:"
+                                + categoryDetailOutput.getVersion())
+                .lastModified(categoryDetailOutput.getUpdatedAt().toInstant())
+                .body(categoryDetailOutput);
     }
 
     @PutMapping("/{categoryId}")
     @CanWriteCategories
-    public CategoryDetailOutput update(@PathVariable("categoryId")UUID categoryId, @RequestBody @Valid CategoryInput categoryInput) {
+    public CategoryDetailOutput update(
+            @PathVariable UUID categoryId, @RequestBody @Valid CategoryInput categoryInput) {
         categoryManagementApplicationService.update(categoryId, categoryInput);
 
         return categoryQueryService.findById(categoryId);
@@ -80,7 +86,7 @@ public class CategoryController {
     @DeleteMapping("/{categoryId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @CanWriteCategories
-    public void delete(@PathVariable("categoryId") UUID categoryId) {
+    public void delete(@PathVariable UUID categoryId) {
         categoryManagementApplicationService.disable(categoryId);
     }
 }

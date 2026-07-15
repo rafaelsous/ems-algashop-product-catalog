@@ -9,28 +9,28 @@ import java.lang.annotation.Target;
 
 public class SecurityAnnotations {
 
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.METHOD, ElementType.TYPE})
-	@PreAuthorize("hasAuthority('SCOPE_products:read')")
-	public @interface CanReadProducts {}
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.METHOD, ElementType.TYPE})
+    @PreAuthorize("hasAuthority('SCOPE_products:read')")
+    public @interface CanReadProducts {}
 
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.METHOD, ElementType.TYPE})
-	@PreAuthorize("hasAuthority('SCOPE_products:write')")
-	public @interface CanWriteProducts {}
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.METHOD, ElementType.TYPE})
+    @PreAuthorize("hasAuthority('SCOPE_products:write') and not hasRole('CUSTOMER')")
+    public @interface CanWriteProducts {}
 
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.METHOD, ElementType.TYPE})
-	@PreAuthorize("hasAuthority('SCOPE_products:stock:write')")
-	public @interface CanWriteProductsStock {}
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.METHOD, ElementType.TYPE})
+    @PreAuthorize("hasAuthority('SCOPE_products:stock:write') and hasRole('MANAGER')")
+    public @interface CanWriteProductsStock {}
 
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.METHOD, ElementType.TYPE})
-	@PreAuthorize("hasAuthority('SCOPE_categories:read')")
-	public @interface CanReadCategories {}
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.METHOD, ElementType.TYPE})
+    @PreAuthorize("hasAuthority('SCOPE_categories:read')")
+    public @interface CanReadCategories {}
 
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.METHOD, ElementType.TYPE})
-	@PreAuthorize("hasAuthority('SCOPE_categories:write')")
-	public @interface CanWriteCategories {}
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.METHOD, ElementType.TYPE})
+    @PreAuthorize("hasAuthority('SCOPE_categories:write') and not hasRole('CUSTOMER')")
+    public @interface CanWriteCategories {}
 }
