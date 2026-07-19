@@ -43,6 +43,8 @@ public class ProductController {
     @GetMapping("/{productId}")
     @CanReadProducts
     public ResponseEntity<ProductDetailOutput> findById(@PathVariable UUID productId) {
+		log.info("Get product {}", productId);
+
 	    ProductDetailOutput product = productQueryService.findById(productId);
 
         return ResponseEntity.ok()
