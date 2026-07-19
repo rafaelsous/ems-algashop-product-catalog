@@ -69,3 +69,6 @@ eureka:
   client:
     service-url:
         defaultZone: http://service-registry:8761/eureka/
+  instance:
+    instance-id: ${random.uuid}
+    prefer-ip-address: true
