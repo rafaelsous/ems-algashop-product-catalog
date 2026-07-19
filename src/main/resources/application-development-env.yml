@@ -64,3 +64,8 @@ management:
       show-details: always
     env:
       show-values: always
+
+eureka:
+  client:
+    service-url:
+        defaultZone: http://service-registry:8761/eureka/
