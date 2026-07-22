@@ -47,8 +47,9 @@ public class ProductController {
     public ResponseEntity<ProductDetailOutput> findById(@PathVariable UUID productId) {
 		log.info("Get product {}", productId);
 
-		if (Math.random() < 0.3) {
-			Thread.sleep(Duration.ofMinutes(1));
+		if (Math.random() < 0.7) {
+			Thread.sleep(Duration.ofMillis(100));
+			throw new RuntimeException("Simulated error for product " + productId);
 		}
 
 	    ProductDetailOutput product = productQueryService.findById(productId);
