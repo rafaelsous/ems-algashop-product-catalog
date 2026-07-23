@@ -45,12 +45,8 @@ public class ProductController {
     @GetMapping("/{productId}")
     @CanReadProducts
     public ResponseEntity<ProductDetailOutput> findById(@PathVariable UUID productId) {
-		log.info("Get product {}", productId);
-
-		if (Math.random() < 0.7) {
-			Thread.sleep(Duration.ofMillis(100));
-			throw new RuntimeException("Simulated error for product " + productId);
-		}
+		log.info("Getting product {}", productId);
+		Thread.sleep(Duration.ofMillis(100));
 
 	    ProductDetailOutput product = productQueryService.findById(productId);
 
@@ -72,9 +68,13 @@ public class ProductController {
         }
     }
 
+    @SneakyThrows
     @GetMapping
     @CanReadProducts
     public PageModel<ProductSummaryOutput> filter(ProductFilter filter) {
+	    log.info("Filtering products");
+	    Thread.sleep(Duration.ofMillis(100));
+
         return productQueryService.filter(filter);
     }
 
