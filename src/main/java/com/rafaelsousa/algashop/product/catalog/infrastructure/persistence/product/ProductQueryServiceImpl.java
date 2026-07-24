@@ -8,10 +8,9 @@ import com.rafaelsousa.algashop.product.catalog.application.utility.Mapper;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductRepository;
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import java.util.*;
+
 import lombok.RequiredArgsConstructor;
+
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,6 +23,10 @@ import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -49,12 +52,12 @@ public class ProductQueryServiceImpl implements ProductQueryService {
 
     @Override
     public PageModel<ProductSummaryOutput> filter(ProductFilter filter) {
-        Optional<Criteria> criteria = buildCriteria(filter);
+        Optional<List<CriteriaDefinition>> criteria = buildCriteria(filter);
         Optional<TextCriteria> textCriteria = buildTextCriteria(filter.getTerm());
 
         Query query = new Query();
         textCriteria.ifPresent(query::addCriteria);
-        criteria.ifPresent(query::addCriteria);
+        criteria.ifPresent(definitions -> definitions.forEach(query::addCriteria));
 
         long totalElements = mongoOperations.count(query, Product.class);
 
@@ -76,7 +79,8 @@ public class ProductQueryServiceImpl implements ProductQueryService {
                   "$addFields", new Document(SCORE_PROPERTY_NAME, new Document("$meta", "textScore")));
           operations.add(addTextScoreField);
         });
-        criteria.ifPresent(c -> operations.add(Aggregation.match(c)));
+        criteria.ifPresent(definitions ->
+            definitions.forEach(definition -> operations.add(Aggregation.match(definition))));
 
         PageRequest pageRequest = PageRequest.of(filter.getPage(), filter.getSize());
 
@@ -107,7 +111,7 @@ public class ProductQueryServiceImpl implements ProductQueryService {
                 .build();
     }
 
-    private Optional<Criteria> buildCriteria(ProductFilter filter) {
+    private Optional<List<CriteriaDefinition>> buildCriteria(ProductFilter filter) {
         List<CriteriaDefinition> criterias = new ArrayList<>();
 
         filterByEnabled(filter.getEnabled(), criterias);
@@ -119,7 +123,7 @@ public class ProductQueryServiceImpl implements ProductQueryService {
 
         if (criterias.isEmpty()) return Optional.empty();
 
-        return Optional.of(new Criteria().andOperator(criterias.toArray(new Criteria[0])));
+        return Optional.of(criterias);
     }
 
     public Optional<TextCriteria> buildTextCriteria(String term) {
