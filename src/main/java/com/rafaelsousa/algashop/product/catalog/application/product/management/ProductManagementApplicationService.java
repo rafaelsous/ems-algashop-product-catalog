@@ -54,6 +54,7 @@ public class ProductManagementApplicationService {
         productRepository.save(product);
     }
 
+	@CacheEvict(cacheNames = "algashop:products:v1", key = "#productId")
     public void enable(UUID productId) {
         Product product = findProduct(productId);
         product.enable();
@@ -62,6 +63,7 @@ public class ProductManagementApplicationService {
     }
 
 	@Transactional
+	@CacheEvict(cacheNames = "algashop:products:v1", key = "#productId")
 	public void restock(UUID productId, Integer quantity) {
 		Product product = findProduct(productId);
 
@@ -70,6 +72,7 @@ public class ProductManagementApplicationService {
 	}
 
 	@Transactional
+	@CacheEvict(cacheNames = "algashop:products:v1", key = "#productId")
 	public void withdraw(UUID productId, Integer quantity) {
 		Product product = findProduct(productId);
 
