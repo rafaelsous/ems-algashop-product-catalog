@@ -38,6 +38,13 @@ spring:
           issuer-uri: ${shared.params.auth-server-url}
 #          jwk-set-uri: http://127.0.0.1:8081/oauth2/jwks
 
+  kafka:
+    bootstrap-servers: algashop-kafka-1:9092,algashop-kafka-2:9093,algashop-kafka-3:9094 #ponto inicial de conexão
+    admin:
+      fail-fast: true # Falha rápida caso não consiga se conectar ao ‘cluster’
+      auto-create: true # Permite a criação automática de tópicos caso não existam
+      modify-topic-configs: false # Impede a modificação de configurações de tópicos existentes
+
 logging:
   level:
     com.netflix.discovery.DiscoveryClient: OFF
