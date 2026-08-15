@@ -1,6 +1,6 @@
 package com.rafaelsousa.algashop.product.catalog.application.category.management;
 
-import com.rafaelsousa.algashop.product.catalog.application.ApplicationMessagePublisher;
+import com.rafaelsousa.algashop.product.catalog.application.LocalEventPublisher;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.Category;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.CategoryRepository;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CategoryManagementApplicationService {
     private final CategoryRepository categoryRepository;
-    private final ApplicationMessagePublisher applicationMessagePublisher;
+    private final LocalEventPublisher localEventPublisher;
 
 	@CacheEvict(value = "algashop:categories-filter:v1", key = "'default'")
     public UUID create(CategoryInput categoryInput) {
@@ -39,7 +39,7 @@ public class CategoryManagementApplicationService {
 
         categoryRepository.save(category);
 
-        applicationMessagePublisher.send(new CategoryUpdateEvent(category.getId(),
+        localEventPublisher.send(new CategoryUpdateEvent(category.getId(),
                 category.getName(), category.getEnabled()));
     }
 
@@ -51,7 +51,7 @@ public class CategoryManagementApplicationService {
 
         categoryRepository.save(category);
 
-        applicationMessagePublisher.send(new CategoryUpdateEvent(category.getId(),
+        localEventPublisher.send(new CategoryUpdateEvent(category.getId(),
                 category.getName(), category.getEnabled()));
     }
 }

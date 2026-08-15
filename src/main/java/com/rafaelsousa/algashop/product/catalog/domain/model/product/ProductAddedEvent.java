@@ -1,11 +1,11 @@
 package com.rafaelsousa.algashop.product.catalog.domain.model.product;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Getter
 @Builder
