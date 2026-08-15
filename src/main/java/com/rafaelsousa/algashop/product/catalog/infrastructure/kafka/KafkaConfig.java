@@ -23,6 +23,6 @@ public class KafkaConfig {
 
     @Bean
     public IntegrationEventPublisher integrationEventPublisher(KafkaTemplate<String, Object> kafkaTemplate) {
-        return (event, destination) -> kafkaTemplate.send(destination, event);
+        return (event, key, destination) -> kafkaTemplate.send(destination, key, event);
     }
 }
