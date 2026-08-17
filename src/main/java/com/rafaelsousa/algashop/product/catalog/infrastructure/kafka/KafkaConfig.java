@@ -1,6 +1,7 @@
 package com.rafaelsousa.algashop.product.catalog.infrastructure.kafka;
 
-import com.rafaelsousa.algashop.product.catalog.application.IntegrationEventPublisher;
+import com.rafaelsousa.algashop.product.catalog.application.product.event.ProductIntegrationEventPublisher;
+import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,11 +11,13 @@ import org.springframework.kafka.core.KafkaTemplate;
 import java.util.Map;
 
 @Configuration
+@RequiredArgsConstructor
 public class KafkaConfig {
+    private final AlgaShopMessagingKafkaProperties algaShopMessagingKafkaProperties;
 
     @Bean
     public NewTopic productEventTopic() {
-        return TopicBuilder.name("product-catalog.product.events")
+        return TopicBuilder.name(algaShopMessagingKafkaProperties.getProductEventTopicName())
                 .partitions(3)
                 .replicas(3)
                 .configs(Map.of("min.insync.replicas", "2"))
@@ -22,7 +25,12 @@ public class KafkaConfig {
     }
 
     @Bean
-    public IntegrationEventPublisher integrationEventPublisher(KafkaTemplate<String, Object> kafkaTemplate) {
-        return (event, key, destination) -> kafkaTemplate.send(destination, key, event);
+    public ProductIntegrationEventPublisher productIntegrationEventPublisher(
+            KafkaTemplate<String, Object> kafkaTemplate) {
+        return event ->
+                kafkaTemplate.send(
+                        algaShopMessagingKafkaProperties.getProductEventTopicName(),
+                        event.getAggregateId(),
+                        event);
     }
 }
