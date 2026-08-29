@@ -1,6 +1,7 @@
 package com.rafaelsousa.algashop.product.catalog.infrastructure.kafka;
 
 import com.rafaelsousa.algashop.product.catalog.application.product.event.ProductIntegrationEventPublisher;
+import com.rafaelsousa.algashop.product.catalog.infrastructure.utility.BeanValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
@@ -26,11 +27,10 @@ public class KafkaConfig {
 
     @Bean
     public ProductIntegrationEventPublisher productIntegrationEventPublisher(
-            KafkaTemplate<String, Object> kafkaTemplate) {
-        return event ->
-                kafkaTemplate.send(
-                        algaShopMessagingKafkaProperties.getProductEventTopicName(),
-                        event.getAggregateId(),
-                        event);
+        KafkaTemplate<String, Object> kafkaTemplate, BeanValidationUtil beanValidationUtil) {
+        return event -> {
+            beanValidationUtil.validate(event);
+            kafkaTemplate.send(algaShopMessagingKafkaProperties.getProductEventTopicName(), event.getAggregateId(), event);
+        };
     }
 }
