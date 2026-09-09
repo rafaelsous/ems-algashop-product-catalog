@@ -47,13 +47,13 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
-#      retries: 100
+#      retries: 2147483647 # Integer.MAX_VALUE, já é o padrão
       properties:
-#        retry.backoff.ms: 100
-#        retry.backoff.max.ms: 1000
-        request.timeout.ms: 5000
-        delivery.timeout.ms: 10000
-        max.block.ms: 5000
+#        retry.backoff.ms: 100 # espera inicial entre uma tentativa e outra
+#        retry.backoff.max.ms: 1000 # teto do backoff, que cresce a cada nova tentativa
+        request.timeout.ms: 5000 # tempo de UMA ida ao broker esperando a resposta
+        delivery.timeout.ms: 10000 # teto da operação inteira: envio + retries + backoff + confirmação
+        max.block.ms: 5000 # tempo que o próprio send() pode bloquear antes de existir future
         spring.json.type.mapping:
           ProductCatalog.ProductListedIntegrationEvent:com.rafaelsousa.algashop.product.catalog.application.product.event.ProductListedIntegrationEvent,
           ProductCatalog.ProductDelistedIntegrationEvent:com.rafaelsousa.algashop.product.catalog.application.product.event.ProductDelistedIntegrationEvent,

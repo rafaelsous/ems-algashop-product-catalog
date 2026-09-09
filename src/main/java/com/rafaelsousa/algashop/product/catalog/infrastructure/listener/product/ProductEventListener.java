@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -18,7 +17,6 @@ public class ProductEventListener {
     private final Mapper mapper;
     private final ProductIntegrationEventPublisher productIntegrationEventPublisher;
 
-    @Async
     @EventListener(ProductPriceChangedEvent.class)
     public void handle(ProductPriceChangedEvent event) {
         log.info("ProductPriceChangedEvent: {}", event);
