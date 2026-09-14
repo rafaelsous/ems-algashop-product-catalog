@@ -3,14 +3,21 @@ package com.rafaelsousa.algashop.product.catalog.infrastructure.kafka;
 import com.rafaelsousa.algashop.product.catalog.application.product.event.ProductIntegrationEventPublisher;
 import com.rafaelsousa.algashop.product.catalog.infrastructure.utility.BeanValidationUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class KafkaConfig {
@@ -30,7 +37,25 @@ public class KafkaConfig {
         KafkaTemplate<String, Object> kafkaTemplate, BeanValidationUtil beanValidationUtil) {
         return event -> {
             beanValidationUtil.validate(event);
-            kafkaTemplate.send(algaShopMessagingKafkaProperties.getProductEventTopicName(), event.getAggregateId(), event);
+
+            SendResult<String, Object> result;
+	        try {
+		        result = kafkaTemplate.send(algaShopMessagingKafkaProperties.getProductEventTopicName(), event.getAggregateId(), event)
+		                        .get(40, TimeUnit.SECONDS);
+
+                RecordMetadata metadata = result.getRecordMetadata();
+
+                log.info("Published {} to {}-{} at offset {}",
+                    event.getClass().getSimpleName(),
+                    metadata.topic(),
+                    metadata.partition(),
+                    metadata.offset());
+	        } catch (InterruptedException e) {
+		        Thread.currentThread().interrupt();
+		        throw new RuntimeException(e);
+	        } catch (TimeoutException | ExecutionException e) {
+		        throw new RuntimeException(e);
+	        }
         };
     }
 }
