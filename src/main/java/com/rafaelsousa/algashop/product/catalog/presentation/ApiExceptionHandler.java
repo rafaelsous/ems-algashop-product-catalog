@@ -1,10 +1,12 @@
 package com.rafaelsousa.algashop.product.catalog.presentation;
 
+import com.rafaelsousa.algashop.product.catalog.application.EventPublishingException;
 import com.rafaelsousa.algashop.product.catalog.application.ResourceNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.DomainEntityNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.DomainException;
 import java.net.URI;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -27,72 +29,100 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @AllArgsConstructor
 @RestControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
-    public static final String TIMESTAMP_PROPERTY_NAME = "timestamp";
+    private static final ZoneId ZONE_ID = ZoneId.systemDefault();
+	public static final String TIMESTAMP_PROPERTY_NAME = "timestamp";
 
     private final MessageSource messageSource;
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
-			MethodArgumentNotValidException ex, @NonNull HttpHeaders headers, @NonNull HttpStatusCode status,
-			@NonNull WebRequest request) {
+    protected ResponseEntity<@NonNull Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status,
+            @NonNull WebRequest request) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(status);
         problemDetail.setTitle("Invalid fields");
         problemDetail.setDetail("One or more fields are invalid");
         problemDetail.setType(URI.create("/errors/invalid-fields"));
 
-        Map<String, String> fieldErrors = ex.getBindingResult().getAllErrors().stream().collect(
-                Collectors.toMap(
-                        objectError -> ((FieldError) objectError).getField(),
-                        objectError -> messageSource.getMessage(objectError, LocaleContextHolder.getLocale())
-                )
-        );
+        Map<String, String> fieldErrors =
+                ex.getBindingResult().getAllErrors().stream()
+                        .collect(
+                                Collectors.toMap(
+                                        objectError -> ((FieldError) objectError).getField(),
+                                        objectError ->
+                                                messageSource.getMessage(
+                                                        objectError,
+                                                        LocaleContextHolder.getLocale())));
 
         problemDetail.setProperty("fields", fieldErrors);
-        problemDetail.setProperty(TIMESTAMP_PROPERTY_NAME, OffsetDateTime.now());
+        problemDetail.setProperty(TIMESTAMP_PROPERTY_NAME, OffsetDateTime.now(ZONE_ID));
 
         return super.handleExceptionInternal(ex, problemDetail, headers, status, request);
     }
 
-  @ExceptionHandler({DomainEntityNotFoundException.class, ResourceNotFoundException.class})
-  public ProblemDetail handleResourceNotFoundException(Exception ex) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+    @ExceptionHandler({DomainEntityNotFoundException.class, ResourceNotFoundException.class})
+    public ProblemDetail handleResourceNotFoundException(Exception ex) {
+        ProblemDetail problemDetail =
+                ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
         problemDetail.setType(URI.create("/errors/not-found"));
         problemDetail.setTitle("Not found");
-        problemDetail.setProperty(TIMESTAMP_PROPERTY_NAME, OffsetDateTime.now());
+        problemDetail.setProperty(TIMESTAMP_PROPERTY_NAME, OffsetDateTime.now(ZONE_ID));
 
         return problemDetail;
     }
 
-  @ExceptionHandler({DomainException.class, UnprocessableContentException.class, StorageProviderException.class})
-  public ProblemDetail handleUnprocessableContentException(Exception ex) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
+    @ExceptionHandler(EventPublishingException.class)
+    public ProblemDetail handleEventPublishingException(EventPublishingException ex) {
+	    log.error(ex.getMessage(), ex);
+
+        ProblemDetail problemDetail =
+                ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, "Failed to publish event");
+        problemDetail.setType(URI.create("/errors/service-unavailable"));
+        problemDetail.setTitle("Service unavailable");
+        problemDetail.setProperty(TIMESTAMP_PROPERTY_NAME, OffsetDateTime.now(ZONE_ID));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler({
+        DomainException.class,
+        UnprocessableContentException.class,
+        StorageProviderException.class
+    })
+    public ProblemDetail handleUnprocessableContentException(Exception ex) {
+        ProblemDetail problemDetail =
+                ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
         problemDetail.setType(URI.create("/errors/unprocessable-content"));
         problemDetail.setTitle("Unprocessable content");
-        problemDetail.setProperty(TIMESTAMP_PROPERTY_NAME, OffsetDateTime.now());
+        problemDetail.setProperty(TIMESTAMP_PROPERTY_NAME, OffsetDateTime.now(ZONE_ID));
 
         return problemDetail;
     }
 
-	@ExceptionHandler(AuthorizationDeniedException.class)
-	public ProblemDetail handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
-		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
-		problemDetail.setType(URI.create("/errors/forbidden"));
-		problemDetail.setTitle("Forbidden");
-		problemDetail.setProperty(TIMESTAMP_PROPERTY_NAME, OffsetDateTime.now());
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ProblemDetail handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
+        ProblemDetail problemDetail =
+                ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+        problemDetail.setType(URI.create("/errors/forbidden"));
+        problemDetail.setTitle("Forbidden");
+        problemDetail.setProperty(TIMESTAMP_PROPERTY_NAME, OffsetDateTime.now(ZONE_ID));
 
-		return problemDetail;
-	}
+        return problemDetail;
+    }
 
-	@ExceptionHandler(Exception.class)
-	public ProblemDetail handleException(Exception ex) {
-		ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
-				"An unexpected internal server error occurred. Please try again and if the problem persists, contact the system administrator.");
-		problemDetail.setTitle("Internal server error");
-		problemDetail.setType(URI.create("/errors/internal"));
-		problemDetail.setProperty(TIMESTAMP_PROPERTY_NAME, OffsetDateTime.now());
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleException(Exception ex) {
+        ProblemDetail problemDetail =
+                ProblemDetail.forStatusAndDetail(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "An unexpected internal server error occurred. Please try again and if the problem persists, contact the system administrator.");
+        problemDetail.setTitle("Internal server error");
+        problemDetail.setType(URI.create("/errors/internal"));
+        problemDetail.setProperty(TIMESTAMP_PROPERTY_NAME, OffsetDateTime.now(ZONE_ID));
 
-		log.error(ex.getMessage(), ex);
+        log.error(ex.getMessage(), ex);
 
-		return problemDetail;
-	}
+        return problemDetail;
+    }
 }

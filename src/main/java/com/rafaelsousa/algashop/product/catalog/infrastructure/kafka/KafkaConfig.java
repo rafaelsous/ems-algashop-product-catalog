@@ -1,5 +1,6 @@
 package com.rafaelsousa.algashop.product.catalog.infrastructure.kafka;
 
+import com.rafaelsousa.algashop.product.catalog.application.EventPublishingException;
 import com.rafaelsousa.algashop.product.catalog.application.product.event.ProductIntegrationEventPublisher;
 import com.rafaelsousa.algashop.product.catalog.infrastructure.utility.BeanValidationUtil;
 import lombok.RequiredArgsConstructor;
@@ -50,11 +51,11 @@ public class KafkaConfig {
                     metadata.topic(),
                     metadata.partition(),
                     metadata.offset());
-	        } catch (InterruptedException e) {
+	        } catch (InterruptedException ex) {
 		        Thread.currentThread().interrupt();
-		        throw new RuntimeException(e);
-	        } catch (TimeoutException | ExecutionException e) {
-		        throw new RuntimeException(e);
+		        throw new EventPublishingException("Interrupted while publishing", event, ex);
+	        } catch (TimeoutException | ExecutionException ex) {
+		        throw new EventPublishingException("Failed to publish event", event, ex);
 	        }
         };
     }
