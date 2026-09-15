@@ -6,6 +6,7 @@ import com.rafaelsousa.algashop.product.catalog.infrastructure.utility.BeanValid
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,23 +41,27 @@ public class KafkaConfig {
             beanValidationUtil.validate(event);
 
             SendResult<String, Object> result;
-	        try {
-		        result = kafkaTemplate.send(algaShopMessagingKafkaProperties.getProductEventTopicName(), event.getAggregateId(), event)
-		                        .get(40, TimeUnit.SECONDS);
+            try {
+	            ProducerRecord<String, Object> producerRecord = new ProducerRecord<>(algaShopMessagingKafkaProperties.getProductEventTopicName(), event.getAggregateId(), event);
 
-                RecordMetadata metadata = result.getRecordMetadata();
+	            producerRecord.headers().add("idempotency-key", event.getIdempotencyKey().toString().getBytes());
 
-                log.info("Published {} to {}-{} at offset {}",
-                    event.getClass().getSimpleName(),
-                    metadata.topic(),
-                    metadata.partition(),
-                    metadata.offset());
-	        } catch (InterruptedException ex) {
-		        Thread.currentThread().interrupt();
-		        throw new EventPublishingException("Interrupted while publishing", event, ex);
-	        } catch (TimeoutException | ExecutionException ex) {
-		        throw new EventPublishingException("Failed to publish event", event, ex);
-	        }
+				result = kafkaTemplate.send(producerRecord).get(40, TimeUnit.SECONDS);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                throw new EventPublishingException("Interrupted while publishing", event, ex);
+            } catch (TimeoutException | ExecutionException ex) {
+                throw new EventPublishingException("Failed to publish event", event, ex);
+            }
+
+	        RecordMetadata metadata = result.getRecordMetadata();
+
+	        log.info(
+		        "Published {} to {}-{} at offset {}",
+		        event.getClass().getSimpleName(),
+		        metadata.topic(),
+		        metadata.partition(),
+		        metadata.offset());
         };
     }
 }
