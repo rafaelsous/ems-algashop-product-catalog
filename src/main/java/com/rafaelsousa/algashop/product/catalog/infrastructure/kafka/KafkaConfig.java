@@ -44,7 +44,9 @@ public class KafkaConfig {
             try {
 	            ProducerRecord<String, Object> producerRecord = new ProducerRecord<>(algaShopMessagingKafkaProperties.getProductEventTopicName(), event.getAggregateId(), event);
 
-	            producerRecord.headers().add("idempotency-key", event.getIdempotencyKey().toString().getBytes());
+				if (event.getIdempotencyKey() != null) {
+	                producerRecord.headers().add("idempotency-key", event.getIdempotencyKey().toString().getBytes());
+				}
 
 				result = kafkaTemplate.send(producerRecord).get(40, TimeUnit.SECONDS);
             } catch (InterruptedException ex) {
