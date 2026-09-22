@@ -23,6 +23,8 @@ import java.util.concurrent.TimeoutException;
 @Configuration
 @RequiredArgsConstructor
 public class KafkaConfig {
+	public static final String IDEMPOTENCY_KEY_HEADER = "idempotency-key";
+
     private final AlgaShopMessagingKafkaProperties algaShopMessagingKafkaProperties;
 
     @Bean
@@ -45,7 +47,7 @@ public class KafkaConfig {
 	            ProducerRecord<String, Object> producerRecord = new ProducerRecord<>(algaShopMessagingKafkaProperties.getProductEventTopicName(), event.getAggregateId(), event);
 
 				if (event.getIdempotencyKey() != null) {
-	                producerRecord.headers().add("idempotency-key", event.getIdempotencyKey().toString().getBytes());
+	                producerRecord.headers().add(IDEMPOTENCY_KEY_HEADER, event.getIdempotencyKey().toString().getBytes());
 				}
 
 				result = kafkaTemplate.send(producerRecord).get(40, TimeUnit.SECONDS);
