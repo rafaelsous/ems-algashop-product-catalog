@@ -10,6 +10,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.KafkaException;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -54,7 +55,7 @@ public class KafkaConfig {
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
                 throw new EventPublishingException("Interrupted while publishing", event, ex);
-            } catch (TimeoutException | ExecutionException ex) {
+            } catch (TimeoutException | ExecutionException | KafkaException ex) {
                 throw new EventPublishingException("Failed to publish event", event, ex);
             }
 

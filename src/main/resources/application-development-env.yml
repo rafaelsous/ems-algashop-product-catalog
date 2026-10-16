@@ -69,6 +69,8 @@ logging:
     com.netflix.discovery.DiscoveryClient: OFF
     com.netflix.discovery: OFF
     com.netflix.eureka: OFF
+    org.apache.kafka: OFF
+    org.springframework.kafka: OFF
 
 algashop:
   data-load:
