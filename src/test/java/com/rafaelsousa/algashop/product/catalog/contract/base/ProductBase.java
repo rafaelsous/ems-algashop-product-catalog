@@ -58,6 +58,7 @@ class ProductBase {
         mockFilterProducts();
         mockCreateProduct();
         mockInvalidProductFindById();
+        mockValideProductUpdate();
     }
 
     private void mockValidProductFindById() {
@@ -97,5 +98,10 @@ class ProductBase {
     private void mockInvalidProductFindById() {
         when(productQueryService.findById(invalidProductId))
                 .thenThrow(new ResourceNotFoundException());
+    }
+
+    private void mockValideProductUpdate() {
+        when(productManagementApplicationService.update(any(UUID.class), any(ProductInput.class)))
+                .thenReturn(ProductDetailOutputTestDataBuilder.aProduct().id(validProductId).build());
     }
 }
