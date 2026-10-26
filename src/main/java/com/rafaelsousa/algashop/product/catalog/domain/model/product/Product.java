@@ -3,11 +3,9 @@ package com.rafaelsousa.algashop.product.catalog.domain.model.product;
 import com.rafaelsousa.algashop.product.catalog.domain.model.DomainException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.IdGenerator;
 import com.rafaelsousa.algashop.product.catalog.domain.model.category.Category;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.OffsetDateTime;
-import java.util.*;
+
 import lombok.*;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.*;
 import org.springframework.data.domain.AbstractAggregateRoot;
@@ -17,22 +15,27 @@ import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.TextScore;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.OffsetDateTime;
+import java.util.*;
+
 @Getter
 @ToString
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Document(collection = "products")
-@CompoundIndex(name = "pidx_product_by_category_enabledTrue_salePrice",
+@CompoundIndex(
+        name = "pidx_product_by_category_enabledTrue_salePrice",
         def = "{'category.id': 1, 'salePrice': 1}",
         partialFilter = "{'enabled': true}")
-@CompoundIndex(name = "pidx_product_by_category_enabledTrue_createdAt",
+@CompoundIndex(
+        name = "pidx_product_by_category_enabledTrue_createdAt",
         def = "{'category.id': 1, 'createdAt': -1}",
         partialFilter = "{'enabled': true}")
 public class Product extends AbstractAggregateRoot<Product> {
 
-    @Id
-    @EqualsAndHashCode.Include
-    private UUID id;
+    @Id @EqualsAndHashCode.Include private UUID id;
 
     @TextIndexed(weight = 1)
     private String name;
@@ -49,37 +52,37 @@ public class Product extends AbstractAggregateRoot<Product> {
     private BigDecimal regularPrice;
     private BigDecimal salePrice;
 
-    @Version
-    private Long version;
+    @Version private Long version;
 
-    @CreatedDate
-    private OffsetDateTime createdAt;
+    @CreatedDate private OffsetDateTime createdAt;
 
-    @LastModifiedDate
-    private OffsetDateTime updatedAt;
+    @LastModifiedDate private OffsetDateTime updatedAt;
 
-    @CreatedBy
-    private UUID createdByUserId;
+    @CreatedBy private UUID createdByUserId;
 
-    @LastModifiedBy
-    private UUID lastModifiedByUserId;
+    @LastModifiedBy private UUID lastModifiedByUserId;
 
     private ProductCategory category;
 
     private Integer discountPercentageRounded;
 
-    @TextScore
-    private Float score;
+    @TextScore private Float score;
 
-	private Image mainImage;
+    private Image mainImage;
 
-	private Set<Image> images = new HashSet<>();
+    private Set<Image> images = new HashSet<>();
 
     @Builder
-    public Product(String name, String brand, String description, Boolean enabled,
-                   BigDecimal regularPrice, BigDecimal salePrice, Category category) {
+    public Product(
+            String name,
+            String brand,
+            String description,
+            Boolean enabled,
+            BigDecimal regularPrice,
+            BigDecimal salePrice,
+            Category category) {
         this.setId(IdGenerator.generateTimeBasedUUID());
-        
+
         this.setName(name);
         this.setBrand(brand);
         this.setDescription(description);
@@ -143,50 +146,50 @@ public class Product extends AbstractAggregateRoot<Product> {
         return getDiscountPercentageRounded() != null && getDiscountPercentageRounded() > 0;
     }
 
-	public Set<Image> getImages() {
-		return Collections.unmodifiableSet(this.images);
-	}
+    public Set<Image> getImages() {
+        return Collections.unmodifiableSet(this.images);
+    }
 
-	public Optional<Image> getImage(UUID imageId) {
-		Objects.requireNonNull(imageId);
+    public Optional<Image> getImage(UUID imageId) {
+        Objects.requireNonNull(imageId);
 
-		return this.images.stream().filter(image -> image.getId().equals(imageId)).findFirst();
-	}
+        return this.images.stream().filter(image -> image.getId().equals(imageId)).findFirst();
+    }
 
-	public UUID addImage(String imageName) {
-		Objects.requireNonNull(imageName);
+    public UUID addImage(String imageName) {
+        Objects.requireNonNull(imageName);
 
-		Image image = new Image(imageName);
-		this.images.add(image);
+        Image image = new Image(imageName);
+        this.images.add(image);
 
-		if (this.mainImage == null) {
-			this.setMainImage(image);
-		}
+        if (this.mainImage == null) {
+            this.setMainImage(image);
+        }
 
-		return image.getId();
-	}
+        return image.getId();
+    }
 
-	public void changeMainImage(UUID imageId) {
-		Objects.requireNonNull(imageId);
+    public void changeMainImage(UUID imageId) {
+        Objects.requireNonNull(imageId);
 
-		Image image = findImageByIdOrThrowException(imageId);
+        Image image = findImageByIdOrThrowException(imageId);
 
-		setMainImage(image);
-	}
+        setMainImage(image);
+    }
 
-	public void  removeImage(UUID imageId) {
-		Objects.requireNonNull(imageId);
+    public void removeImage(UUID imageId) {
+        Objects.requireNonNull(imageId);
 
-		Image image = findImageByIdOrThrowException(imageId);
+        Image image = findImageByIdOrThrowException(imageId);
 
-		this.images.remove(image);
+        this.images.remove(image);
 
-		if (image.equals(this.mainImage)) {
-			this.setMainImage(this.images.stream().findFirst().orElse(null));
-		}
-	}
+        if (image.equals(this.mainImage)) {
+            this.setMainImage(this.images.stream().findFirst().orElse(null));
+        }
+    }
 
-	public void changePrice(BigDecimal regularPrice, BigDecimal salePrice) {
+    public void changePrice(BigDecimal regularPrice, BigDecimal salePrice) {
         Objects.requireNonNull(regularPrice);
         Objects.requireNonNull(salePrice);
 
@@ -249,9 +252,9 @@ public class Product extends AbstractAggregateRoot<Product> {
         this.quantityInStock = quantityInStock;
     }
 
-	private void setMainImage(Image mainImage) {
-		this.mainImage = mainImage;
-	}
+    private void setMainImage(Image mainImage) {
+        this.mainImage = mainImage;
+    }
 
     private void calculateDiscountPercentageRounded() {
         if (regularPrice == null || salePrice == null || regularPrice.signum() == 0) {
@@ -259,11 +262,12 @@ public class Product extends AbstractAggregateRoot<Product> {
             return;
         }
 
-        discountPercentageRounded = BigDecimal.ONE
-                .subtract(salePrice.divide(regularPrice, 4, RoundingMode.HALF_UP))
-                .multiply(BigDecimal.valueOf(100))
-                .setScale(2, RoundingMode.HALF_UP)
-                .intValue();
+        discountPercentageRounded =
+                BigDecimal.ONE
+                        .subtract(salePrice.divide(regularPrice, 4, RoundingMode.HALF_UP))
+                        .multiply(BigDecimal.valueOf(100))
+                        .setScale(2, RoundingMode.HALF_UP)
+                        .intValue();
     }
 
     private boolean pricesDidNotChange(BigDecimal oldRegularPrice, BigDecimal oldSalePrice) {
@@ -279,8 +283,7 @@ public class Product extends AbstractAggregateRoot<Product> {
                         .newRegularPrice(this.regularPrice)
                         .oldSalePrice(oldSalePrice)
                         .oldRegularPrice(oldRegularPrice)
-                    .build()
-        );
+                        .build());
     }
 
     private boolean isNewlyOnSale(boolean wasOnSale) {
@@ -293,13 +296,24 @@ public class Product extends AbstractAggregateRoot<Product> {
                         .productId(this.id)
                         .regularPrice(this.regularPrice)
                         .salePrice(this.salePrice)
-                    .build()
-        );
+                        .build());
     }
 
-	private Image findImageByIdOrThrowException(UUID imageId) {
-		return getImage(imageId)
-				.orElseThrow(() -> new DomainException(
-						String.format("Image of id %s was not found on product %s", imageId, this.id)));
-	}
+    private Image findImageByIdOrThrowException(UUID imageId) {
+        return getImage(imageId)
+                .orElseThrow(
+                        () ->
+                                new DomainException(
+                                        String.format(
+                                                "Image of id %s was not found on product %s",
+                                                imageId, this.id)));
+    }
+
+    public boolean hasQuantity(int quantity) {
+		if (quantity < 1) {
+			throw new IllegalArgumentException();
+		}
+
+		return this.getQuantityInStock() != null && this.getQuantityInStock() >= quantity;
+    }
 }

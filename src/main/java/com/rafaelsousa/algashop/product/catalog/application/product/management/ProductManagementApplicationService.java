@@ -74,7 +74,7 @@ public class ProductManagementApplicationService {
 	public void restock(UUID productId, Integer quantity) {
 		Product product = findProduct(productId);
 
-		StockMovement stockMovement = stockService.restock(product, quantity);
+		StockMovement stockMovement = stockService.restock(product.getId(), quantity);
 		stockMovementRepository.save(stockMovement);
 	}
 
@@ -83,7 +83,7 @@ public class ProductManagementApplicationService {
 	public void withdraw(UUID productId, Integer quantity) {
 		Product product = findProduct(productId);
 
-		StockMovement stockMovement = stockService.withdraw(product, quantity);
+		StockMovement stockMovement = stockService.withdraw(product.getId(), quantity);
 		stockMovementRepository.save(stockMovement);
 	}
 

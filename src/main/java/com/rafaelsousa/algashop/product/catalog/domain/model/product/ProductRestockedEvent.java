@@ -1,5 +1,6 @@
 package com.rafaelsousa.algashop.product.catalog.domain.model.product;
 
+import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.Builder;
@@ -13,5 +14,5 @@ public class ProductRestockedEvent {
 	private UUID productId;
 
 	@Builder.Default
-	private OffsetDateTime restockedAt = OffsetDateTime.now();
+	private OffsetDateTime restockedAt = OffsetDateTime.now(Clock.systemDefaultZone());
 }

@@ -3,6 +3,8 @@ package com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.prod
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductNotFoundException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.stock.QuantityInStockAdjustment;
+
+import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +16,12 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
+@Transactional(propagation = Propagation.MANDATORY)
 public class QuantityInStockAdjustmentMongoDBImpl implements QuantityInStockAdjustment {
     public static final String QUANTITY_IN_STOCK_PROPERTY_NAME = "quantityInStock";
 
@@ -57,7 +62,7 @@ public class QuantityInStockAdjustmentMongoDBImpl implements QuantityInStockAdju
         Update update = new Update()
                 .inc(QUANTITY_IN_STOCK_PROPERTY_NAME, quantity)
                 .inc("version", 1)
-                .set("updatedAt", OffsetDateTime.now());
+                .set("updatedAt", OffsetDateTime.now(Clock.systemDefaultZone()));
 
         Product updatedProduct = mongoOperations.findAndModify(queryForUpdate, update, new FindAndModifyOptions()
                 .returnNew(true), Product.class);

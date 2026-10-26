@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -14,5 +15,5 @@ public class ProductSoldOutEvent {
 	private UUID productId;
 
 	@Builder.Default
-	private OffsetDateTime soldOutAt = OffsetDateTime.now();
+	private OffsetDateTime soldOutAt = OffsetDateTime.now(Clock.systemDefaultZone());
 }

@@ -1,76 +1,93 @@
 package com.rafaelsousa.algashop.product.catalog.domain.model.stock;
 
-import com.rafaelsousa.algashop.product.catalog.domain.model.DomainEventPublisher;
-import com.rafaelsousa.algashop.product.catalog.domain.model.DomainException;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;
-import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductRestockedEvent;
-import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductSoldOutEvent;
+import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductNotFoundException;
+import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductRepository;
 import com.rafaelsousa.algashop.product.catalog.domain.model.stock.QuantityInStockAdjustment.Result;
-import java.util.Objects;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class StockService {
-	private final DomainEventPublisher domainEventPublisher;
-	private final QuantityInStockAdjustment quantityInStockAdjustment;
+    private final ProductRepository productRepository;
+    private final QuantityInStockAdjustment quantityInStockAdjustment;
 
-	public StockMovement restock(Product product, int quantity) {
-		Objects.requireNonNull(product);
+    public StockMovement restock(UUID productId, int quantity) {
+        Objects.requireNonNull(productId);
 
-		if (quantity < 1) {
-			throw new IllegalArgumentException();
-		}
+        if (quantity < 1) {
+            throw new IllegalArgumentException();
+        }
 
-		Result result;
-		try {
-			result = quantityInStockAdjustment.increase(product.getId(), quantity);
-		} catch (Exception _) {
-            throw new DomainException(String.format("Failed to restock product %s on stock", product.getId()));
-		}
+        Result result = quantityInStockAdjustment.increase(productId, quantity);
 
-		if (result.inRestocked()) {
-			domainEventPublisher.publishEvent(ProductRestockedEvent.builder()
-					.productId(product.getId())
-					.build());
-		}
+        return StockMovement.builder()
+                .productId(productId)
+                .movementQuantity(quantity)
+                .previousQuantity(result.previousQuantity())
+                .newQuantity(result.newQuantity())
+                .type(StockMovement.MovementType.STOCK_IN)
+                .build();
+    }
 
-    return StockMovement.builder()
-        .productId(product.getId())
-        .movementQuantity(quantity)
-        .previousQuantity(result.previousQuantity())
-        .newQuantity(result.newQuantity())
-        .type(StockMovement.MovementType.STOCK_IN)
-        .build();
+	public StockMovement withdraw(UUID productId, int quantity) {
+		return withdraw(productId, quantity, null);
 	}
 
-	public StockMovement withdraw(Product product, int quantity) {
-		Objects.requireNonNull(product);
+    public StockMovement withdraw(UUID productId, int quantity, String orderId) {
+        Objects.requireNonNull(productId);
 
-		if (quantity < 1) {
-			throw new IllegalArgumentException();
-		}
+        if (quantity < 1) {
+            throw new IllegalArgumentException();
+        }
 
-		Result result;
-		try {
-			result = quantityInStockAdjustment.decrease(product.getId(), quantity);
-		} catch (Exception _) {
-			throw new DomainException(String.format("Failed to withdrawn product %s from stock", product.getId()));
-		}
+        Result result = quantityInStockAdjustment.decrease(productId, quantity);
 
-		if (result.isOutOfStock()) {
-			domainEventPublisher.publishEvent(ProductSoldOutEvent.builder()
-					.productId(product.getId())
-					.build());
-		}
+        return StockMovement.builder()
+                .productId(productId)
+                .movementQuantity(quantity)
+                .previousQuantity(result.previousQuantity())
+                .newQuantity(result.newQuantity())
+                .type(StockMovement.MovementType.STOCK_OUT)
+                .orderId(orderId)
+                .build();
+    }
 
-		return StockMovement.builder()
-				.productId(product.getId())
-				.movementQuantity(quantity)
-				.previousQuantity(result.previousQuantity())
-				.newQuantity(result.newQuantity())
-				.type(StockMovement.MovementType.STOCK_OUT)
-				.build();
-	}
+    public List<StockMovement> withdrawAll(String orderId, List<StockReservationItem> items) {
+        Map<UUID, Integer> quantityByProduct =
+                items.stream()
+                        .collect(
+                                Collectors.groupingBy(
+                                        StockReservationItem::getProductId,
+                                        Collectors.summingInt(StockReservationItem::getQuantity)));
+
+        Map<UUID, Product> productById =
+                productRepository.findAllById(quantityByProduct.keySet()).stream()
+                        .collect(Collectors.toMap(Product::getId, Function.identity()));
+
+        quantityByProduct.forEach(
+                (productId, quantity) -> {
+                    Product product = productById.get(productId);
+
+                    if (product == null) {
+                        throw new ProductNotFoundException(productId);
+                    }
+
+                    if (!product.hasQuantity(quantity)) {
+                        throw new InsufficientStockException(
+                                productId, product.getQuantityInStock(), quantity);
+                    }
+                });
+
+        return quantityByProduct.entrySet().stream()
+                .map(entry -> withdraw(entry.getKey(), entry.getValue(), orderId))
+                .toList();
+    }
 }
