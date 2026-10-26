@@ -46,7 +46,8 @@ spring:
         ProductCatalog.ProductDelistedIntegrationEvent:com.rafaelsousa.algashop.product.catalog.application.product.event.ProductDelistedIntegrationEvent,
         ProductCatalog.ProductAddedIntegrationEvent:com.rafaelsousa.algashop.product.catalog.application.product.event.ProductAddedIntegrationEvent,
         ProductCatalog.ProductPriceChangedIntegrationEvent:com.rafaelsousa.algashop.product.catalog.application.product.event.ProductPriceChangedIntegrationEvent,
-        ProductCatalog.ProductPriceChangedV2IntegrationEvent:com.rafaelsousa.algashop.product.catalog.application.product.event.ProductPriceChangedV2IntegrationEvent
+        ProductCatalog.ProductPriceChangedV2IntegrationEvent:com.rafaelsousa.algashop.product.catalog.application.product.event.ProductPriceChangedV2IntegrationEvent,
+        Ordering.OrderPaidIntegrationEvent:com.rafaelsousa.algashop.product.catalog.application.order.event.OrderPaidIntegrationEvent
     admin:
       fail-fast: true
       auto-create: true

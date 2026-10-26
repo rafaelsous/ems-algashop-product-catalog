@@ -32,7 +32,7 @@ public class StockReservationApplicationService {
         try {
             movements = stockService.withdrawAll(orderId, items);
             stockReservation = StockReservation.confirmed(orderId, items);
-        } catch (InsufficientStockException | ProductNotFoundException ex) {
+        } catch (InsufficientStockException | ProductNotFoundException _) {
             movements = List.of();
             stockReservation = StockReservation.rejected(orderId, items);
         }
