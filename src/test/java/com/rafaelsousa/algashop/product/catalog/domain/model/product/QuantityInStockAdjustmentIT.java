@@ -1,7 +1,8 @@
 package com.rafaelsousa.algashop.product.catalog.domain.model.product;
 
 import com.rafaelsousa.algashop.product.catalog.TestcontainerMongoDBConfig;
-import com.rafaelsousa.algashop.product.catalog.domain.model.product.QuantityInStockAdjustment.Result;
+import com.rafaelsousa.algashop.product.catalog.domain.model.stock.QuantityInStockAdjustment;
+import com.rafaelsousa.algashop.product.catalog.domain.model.stock.QuantityInStockAdjustment.Result;
 import com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.config.MongoConfig;
 import com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.dataload.DataLoadProperties;
 import com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.dataload.DataLoader;

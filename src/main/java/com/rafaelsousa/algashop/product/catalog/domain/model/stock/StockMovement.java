@@ -1,15 +1,16 @@
-package com.rafaelsousa.algashop.product.catalog.domain.model.product;
+package com.rafaelsousa.algashop.product.catalog.domain.model.stock;
 
 import com.rafaelsousa.algashop.product.catalog.domain.model.IdGenerator;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Clock;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Getter
-@Document
+@Document(collection = "stock_movements")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StockMovement {
@@ -29,7 +30,7 @@ public class StockMovement {
     public StockMovement(UUID productId, Integer movementQuantity,
                        Integer previousQuantity, Integer newQuantity, MovementType type) {
 	    this.id = IdGenerator.generateTimeBasedUUID();
-		this.occurredAt = OffsetDateTime.now();
+		this.occurredAt = OffsetDateTime.now(Clock.systemDefaultZone());
 
 		this.productId = productId;
 		this.movementQuantity = movementQuantity;

@@ -2,7 +2,7 @@ package com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.prod
 
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;
 import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductNotFoundException;
-import com.rafaelsousa.algashop.product.catalog.domain.model.product.QuantityInStockAdjustment;
+import com.rafaelsousa.algashop.product.catalog.domain.model.stock.QuantityInStockAdjustment;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

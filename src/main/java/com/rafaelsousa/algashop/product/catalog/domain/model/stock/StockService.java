@@ -1,8 +1,11 @@
-package com.rafaelsousa.algashop.product.catalog.domain.model.product;
+package com.rafaelsousa.algashop.product.catalog.domain.model.stock;
 
 import com.rafaelsousa.algashop.product.catalog.domain.model.DomainEventPublisher;
 import com.rafaelsousa.algashop.product.catalog.domain.model.DomainException;
-import com.rafaelsousa.algashop.product.catalog.domain.model.product.QuantityInStockAdjustment.Result;
+import com.rafaelsousa.algashop.product.catalog.domain.model.product.Product;
+import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductRestockedEvent;
+import com.rafaelsousa.algashop.product.catalog.domain.model.product.ProductSoldOutEvent;
+import com.rafaelsousa.algashop.product.catalog.domain.model.stock.QuantityInStockAdjustment.Result;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
