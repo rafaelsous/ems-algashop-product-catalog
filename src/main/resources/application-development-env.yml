@@ -47,6 +47,8 @@ spring:
         ProductCatalog.ProductAddedIntegrationEvent:com.rafaelsousa.algashop.product.catalog.application.product.event.ProductAddedIntegrationEvent,
         ProductCatalog.ProductPriceChangedIntegrationEvent:com.rafaelsousa.algashop.product.catalog.application.product.event.ProductPriceChangedIntegrationEvent,
         ProductCatalog.ProductPriceChangedV2IntegrationEvent:com.rafaelsousa.algashop.product.catalog.application.product.event.ProductPriceChangedV2IntegrationEvent,
+        ProductCatalog.StockReservationConfirmedIntegrationEvent:com.rafaelsousa.algashop.product.catalog.application.stock.event.StockReservationConfirmedIntegrationEvent,
+        ProductCatalog.StockReservationRejectedIntegrationEvent:com.rafaelsousa.algashop.product.catalog.application.stock.event.StockReservationRejectedIntegrationEvent,
         Ordering.OrderPaidIntegrationEvent:com.rafaelsousa.algashop.product.catalog.application.order.event.OrderPaidIntegrationEvent
     admin:
       fail-fast: true
@@ -95,6 +97,7 @@ algashop:
   messaging:
     kafka:
       product-event-topic-name: product-catalog.product.events
+      stock-event-topic-name: product-catalog.stock.events
       order-event-topic-name: ordering.order.events
       order-events-consumer-group: product-catalog.order-events
 

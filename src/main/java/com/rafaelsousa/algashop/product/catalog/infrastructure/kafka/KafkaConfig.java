@@ -3,6 +3,7 @@ package com.rafaelsousa.algashop.product.catalog.infrastructure.kafka;
 import com.rafaelsousa.algashop.product.catalog.application.EventPublishingException;
 import com.rafaelsousa.algashop.product.catalog.application.IntegrationEvent;
 import com.rafaelsousa.algashop.product.catalog.application.product.event.ProductIntegrationEventPublisher;
+import com.rafaelsousa.algashop.product.catalog.application.stock.event.StockIntegrationEventPublisher;
 import com.rafaelsousa.algashop.product.catalog.domain.model.DomainException;
 import com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.product.StockUpdateFailedException;
 import com.rafaelsousa.algashop.product.catalog.infrastructure.utility.BeanValidationUtil;
@@ -18,8 +19,8 @@ import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.kafka.KafkaException;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -67,7 +68,7 @@ public class KafkaConfig {
                 DomainException.class,
                 ConstraintViolationException.class,
                 DataIntegrityViolationException.class,
-                DataAccessException.class,
+                DuplicateKeyException.class,
                 IllegalArgumentException.class);
 
         return defaultErrorHandler;
@@ -101,19 +102,43 @@ public class KafkaConfig {
     }
 
     @Bean
+    public NewTopic stockEventTopic() {
+        return TopicBuilder.name(properties.getStockEventTopicName())
+                .partitions(TOPIC_PARTITIONS)
+                .replicas(TOPIC_REPLICAS)
+                .configs(Map.of(MIN_INSYNC_REPLICAS_CONFIG, "2"))
+                .build();
+    }
+
+    @Bean
     public NewTopic orderEventsDlt() {
         return createDeadLetterTopic(properties.getOrderEventTopicName());
     }
 
     @Bean
     public ProductIntegrationEventPublisher productIntegrationEventPublisher(
-            KafkaTemplate<String, Object> kafkaTemplate, BeanValidationUtil beanValidationUtil, AlgaShopMessagingKafkaProperties properties) {
+            KafkaTemplate<String, Object> kafkaTemplate,
+            BeanValidationUtil beanValidationUtil,
+            AlgaShopMessagingKafkaProperties properties) {
         return event ->
                 publish(
                         kafkaTemplate,
                         beanValidationUtil,
                         event,
                         properties.getProductEventTopicName());
+    }
+
+    @Bean
+    public StockIntegrationEventPublisher stockIntegrationEventPublisher(
+            KafkaTemplate<String, Object> kafkaTemplate,
+            BeanValidationUtil beanValidationUtil,
+            AlgaShopMessagingKafkaProperties properties) {
+        return event ->
+                publish(
+                        kafkaTemplate,
+                        beanValidationUtil,
+                        event,
+                        properties.getStockEventTopicName());
     }
 
     private void publish(
