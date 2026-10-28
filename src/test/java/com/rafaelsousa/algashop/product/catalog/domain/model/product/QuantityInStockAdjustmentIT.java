@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.data.mongodb.test.autoconfigure.DataMongoTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -27,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 		QuantityInStockAdjustmentMongoDBImpl.class,
 		TestcontainerMongoDBConfig.class
 })
-//@Transactional
+@Transactional
 class QuantityInStockAdjustmentIT {
 	private static final UUID EXISTING_PRODUCT_ID = UUID.fromString("946cea3b-d11d-4f11-b88d-3089b4e74087");
 
