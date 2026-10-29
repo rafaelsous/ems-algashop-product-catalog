@@ -1,6 +1,6 @@
 package com.rafaelsousa.algashop.product.catalog.application.product.event;
 
-import com.rafaelsousa.algashop.product.catalog.application.IntegrationEvent;
+import com.rafaelsousa.algashop.product.catalog.application.OutboundIntegrationEvent;
 
 import com.rafaelsousa.algashop.product.catalog.domain.model.IdGenerator;
 import jakarta.validation.constraints.NotNull;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductPriceChangedV2IntegrationEvent implements IntegrationEvent {
+public class ProductPriceChangedV2IntegrationEvent implements OutboundIntegrationEvent {
 	private UUID idempotencyKey = IdGenerator.generateTimeBasedUUID();
 
 	@NotNull

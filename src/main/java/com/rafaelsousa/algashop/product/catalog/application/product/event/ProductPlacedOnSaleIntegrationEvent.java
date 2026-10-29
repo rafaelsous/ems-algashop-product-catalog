@@ -1,6 +1,6 @@
 package com.rafaelsousa.algashop.product.catalog.application.product.event;
 
-import com.rafaelsousa.algashop.product.catalog.application.IntegrationEvent;
+import com.rafaelsousa.algashop.product.catalog.application.OutboundIntegrationEvent;
 import com.rafaelsousa.algashop.product.catalog.domain.model.IdGenerator;
 
 import lombok.*;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductPlacedOnSaleIntegrationEvent implements IntegrationEvent {
+public class ProductPlacedOnSaleIntegrationEvent implements OutboundIntegrationEvent {
     private UUID productId;
     private BigDecimal salePrice;
     private BigDecimal regularPrice;

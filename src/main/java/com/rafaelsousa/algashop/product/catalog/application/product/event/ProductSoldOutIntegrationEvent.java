@@ -1,6 +1,6 @@
 package com.rafaelsousa.algashop.product.catalog.application.product.event;
 
-import com.rafaelsousa.algashop.product.catalog.application.IntegrationEvent;
+import com.rafaelsousa.algashop.product.catalog.application.OutboundIntegrationEvent;
 import com.rafaelsousa.algashop.product.catalog.domain.model.IdGenerator;
 
 import lombok.*;
@@ -13,7 +13,7 @@ import java.util.UUID;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductSoldOutIntegrationEvent implements IntegrationEvent {
+public class ProductSoldOutIntegrationEvent implements OutboundIntegrationEvent {
     private UUID productId;
     private OffsetDateTime soldOutAt;
     private UUID idempotencyKey = IdGenerator.generateTimeBasedUUID();

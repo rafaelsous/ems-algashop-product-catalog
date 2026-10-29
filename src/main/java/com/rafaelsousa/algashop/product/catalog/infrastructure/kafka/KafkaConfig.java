@@ -1,7 +1,7 @@
 package com.rafaelsousa.algashop.product.catalog.infrastructure.kafka;
 
 import com.rafaelsousa.algashop.product.catalog.application.EventPublishingException;
-import com.rafaelsousa.algashop.product.catalog.application.IntegrationEvent;
+import com.rafaelsousa.algashop.product.catalog.application.OutboundIntegrationEvent;
 import com.rafaelsousa.algashop.product.catalog.application.product.event.ProductIntegrationEventPublisher;
 import com.rafaelsousa.algashop.product.catalog.domain.model.DomainException;
 import com.rafaelsousa.algashop.product.catalog.infrastructure.persistence.product.StockUpdateFailedException;
@@ -116,7 +116,7 @@ public class KafkaConfig {
     private void publish(
             KafkaTemplate<String, Object> kafkaTemplate,
             BeanValidationUtil beanValidationUtil,
-            IntegrationEvent event,
+            OutboundIntegrationEvent event,
             String targetTopicName) {
         beanValidationUtil.validate(event);
 
