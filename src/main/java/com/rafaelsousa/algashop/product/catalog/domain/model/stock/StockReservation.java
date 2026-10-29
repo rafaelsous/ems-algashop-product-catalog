@@ -1,12 +1,9 @@
 package com.rafaelsousa.algashop.product.catalog.domain.model.stock;
 
 import com.rafaelsousa.algashop.product.catalog.domain.model.IdGenerator;
-import com.rafaelsousa.algashop.product.catalog.domain.model.stock.event.StockReservationConfirmedEvent;
-import com.rafaelsousa.algashop.product.catalog.domain.model.stock.event.StockReservationRejectedEvent;
 import lombok.*;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -21,7 +18,7 @@ import java.util.UUID;
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Document(collection = "stock_reservations")
-public class StockReservation extends AbstractAggregateRoot<StockReservation> {
+public class StockReservation {
 
     @Id @EqualsAndHashCode.Include private UUID id;
 
@@ -47,25 +44,11 @@ public class StockReservation extends AbstractAggregateRoot<StockReservation> {
     }
 
     public static StockReservation confirmed(String orderId, List<StockReservationItem> items) {
-        StockReservation stockReservation = new StockReservation(orderId, Status.CONFIRMED, items);
-        stockReservation.registerEvent(
-                StockReservationConfirmedEvent.builder()
-                        .reservationId(stockReservation.getId())
-                        .orderId(stockReservation.getOrderId())
-                        .build());
-
-        return stockReservation;
+	    return new StockReservation(orderId, Status.CONFIRMED, items);
     }
 
     public static StockReservation rejected(String orderId, List<StockReservationItem> items) {
-        StockReservation stockReservation = new StockReservation(orderId, Status.REJECTED, items);
-        stockReservation.registerEvent(
-                StockReservationRejectedEvent.builder()
-                        .reservationId(stockReservation.getId())
-                        .orderId(stockReservation.getOrderId())
-                        .build());
-
-        return stockReservation;
+        return new StockReservation(orderId, Status.REJECTED, items);
     }
 
     public boolean isConfirmed() {
