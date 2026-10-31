@@ -101,6 +101,15 @@ public class KafkaConfig {
     }
 
     @Bean
+    public NewTopic stockCommandsTopic() {
+        return TopicBuilder.name(properties.getStockCommandsTopicName())
+                .partitions(TOPIC_PARTITIONS)
+                .replicas(TOPIC_REPLICAS)
+                .configs(Map.of(MIN_INSYNC_REPLICAS_CONFIG, "2"))
+                .build();
+    }
+
+    @Bean
     public ProductIntegrationEventPublisher productIntegrationEventPublisher(
             KafkaTemplate<String, Object> kafkaTemplate,
             BeanValidationUtil beanValidationUtil,
